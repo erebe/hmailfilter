@@ -17,7 +17,7 @@ cabal-version:       >=1.10
 
 executable hmailfilter
   main-is:             Main.hs
-  ghc-options:         -Wall -O3 -threaded
+  ghc-options:         -Wall -O3 
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base, bytestring, attoparsec

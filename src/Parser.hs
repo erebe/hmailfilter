@@ -9,7 +9,6 @@ import           Data.ByteString.Char8
 import           Control.Monad
 import           Prelude                          hiding (takeWhile)
 import           Data.Monoid
-import           Data.Either
 
 data HeaderName = ReturnPath
                 | OriginalTo
@@ -46,7 +45,7 @@ parseHeaderName =     ("Return-Path"   >> return ReturnPath)
 parseHeader :: Parser Header
 parseHeader = do
     header <- parseHeaderName
-    char ':'
+    _ <- char ':'
     value <- takeValue
     return $ Header header value
 
