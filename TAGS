@@ -1,0 +1,112 @@
+
+./Setup.hs,15
+main main1,2
+
+./src/Main.hs,767
+module Main Main2,3
+data HeaderName HeaderName9,10
+data HeaderName = ReturnPathReturnPath9,10
+                | OriginalToOriginalTo10,11
+                | DeliveredToDeliveredTo11,12
+                | ReceivedReceived12,13
+                | ContentTypeContentType13,14
+                | ThreadTopicThreadTopic14,15
+                | DateDate15,16
+                | SubjectSubject16,17
+                | FromFrom17,18
+                | ToTo18,19
+                | CcCc19,20
+                | BccBcc20,21
+data Header Header23,24
+data Header = Header Header23,24
+parseHeaderName parseHeaderName25,26
+parseHeaderName parseHeaderName26,27
+parseHeader parseHeader29,30
+parseHeader parseHeader30,31
+main main32,33
+main main33,34
+
+./src/flycheck_Main.hs,767
+module Main Main2,3
+data HeaderName HeaderName9,10
+data HeaderName = ReturnPathReturnPath9,10
+                | OriginalToOriginalTo10,11
+                | DeliveredToDeliveredTo11,12
+                | ReceivedReceived12,13
+                | ContentTypeContentType13,14
+                | ThreadTopicThreadTopic14,15
+                | DateDate15,16
+                | SubjectSubject16,17
+                | FromFrom17,18
+                | ToTo18,19
+                | CcCc19,20
+                | BccBcc20,21
+data Header Header23,24
+data Header = Header Header23,24
+parseHeaderName parseHeaderName25,26
+parseHeaderName parseHeaderName26,27
+parseHeader parseHeader29,30
+parseHeader parseHeader30,31
+main main32,33
+main main33,34
+
+./dist/build/autogen/Paths_hprocmail.hs,968
+module Paths_hprocmail Paths_hprocmail0,1
+catchIO catchIO11,12
+catchIO catchIO12,13
+version version14,15
+version version15,16
+bindir, libdir, datadir, libexecdir, sysconfdir sysconfdir16,17
+bindir, libdir, datadir, libexecdir,libexecdir16,17
+bindir, libdir, datadir,datadir16,17
+bindir, libdir,libdir16,17
+bindir,bindir16,17
+bindir bindir18,19
+libdir libdir19,20
+datadir datadir20,21
+libexecdir libexecdir21,22
+sysconfdir sysconfdir22,23
+getBinDir, getLibDir, getDataDir, getLibexecDir, getSysconfDir getSysconfDir24,25
+getBinDir, getLibDir, getDataDir, getLibexecDir,getLibexecDir24,25
+getBinDir, getLibDir, getDataDir,getDataDir24,25
+getBinDir, getLibDir,getLibDir24,25
+getBinDir,getBinDir24,25
+getBinDir getBinDir25,26
+getLibDir getLibDir26,27
+getDataDir getDataDir27,28
+getLibexecDir getLibexecDir28,29
+getSysconfDir getSysconfDir29,30
+getDataFileName getDataFileName31,32
+getDataFileName getDataFileName32,33
+
+./dist/dist-sandbox-473cb6ad/setup/setup.hs,19
+import import0,1
+
+./dist/dist-sandbox-473cb6ad/build/autogen/Paths_hprocmail.hs,968
+module Paths_hprocmail Paths_hprocmail0,1
+catchIO catchIO11,12
+catchIO catchIO12,13
+version version14,15
+version version15,16
+bindir, libdir, datadir, libexecdir, sysconfdir sysconfdir16,17
+bindir, libdir, datadir, libexecdir,libexecdir16,17
+bindir, libdir, datadir,datadir16,17
+bindir, libdir,libdir16,17
+bindir,bindir16,17
+bindir bindir18,19
+libdir libdir19,20
+datadir datadir20,21
+libexecdir libexecdir21,22
+sysconfdir sysconfdir22,23
+getBinDir, getLibDir, getDataDir, getLibexecDir, getSysconfDir getSysconfDir24,25
+getBinDir, getLibDir, getDataDir, getLibexecDir,getLibexecDir24,25
+getBinDir, getLibDir, getDataDir,getDataDir24,25
+getBinDir, getLibDir,getLibDir24,25
+getBinDir,getBinDir24,25
+getBinDir getBinDir25,26
+getLibDir getLibDir26,27
+getDataDir getDataDir27,28
+getLibexecDir getLibexecDir28,29
+getSysconfDir getSysconfDir29,30
+getDataFileName getDataFileName31,32
+getDataFileName getDataFileName32,33
