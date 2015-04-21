@@ -11,7 +11,7 @@ import           Data.List                        (find)
 import           Data.Maybe
 import           Data.Monoid
 import           Data.Char
-import Prelude hiding (map, null, getContents, head, tail, takeWhile, dropWhile, reverse, elem)
+import Prelude hiding (map, null, getContents, head, tail, takeWhile, dropWhile, reverse, elem, putStrLn)
 
 
 
@@ -69,7 +69,7 @@ main = do
                
     let outputPath = find (not . null) $ runFilter hs <$> filters
     let path = fromMaybe "./" outputPath
-    print path
+    putStrLn path
 
     where
       filters = [
