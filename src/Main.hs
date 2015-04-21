@@ -57,6 +57,11 @@ orgaIF = subject $ anyOf ["[BdE - Equipe Orga IF]"]
 bde :: Match Any
 bde = subject $ anyOf ["[ BdE -"]
        
+devNull :: Match Any
+devNull = for $ anyOf ["devnull@"]
+
+tabulaRasa :: Match Any
+tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 
 main :: IO ()
 main = do
@@ -83,10 +88,12 @@ main = do
 
             -- ToMe
           ,  [pourMoi]      ->> const "./"
+          ,  [devNull]      ->> const "/dev/null"
+          ,  [tabulaRasa]   ->> const ".Compte.TabulaRasa/"
           ,  [pourDomaine]  ->> \hs -> ".Compte." <> virtualUser hs <> "/"
             
             -- Mailing
-          ,  [haskell]      ->> const ".Compte.Haskell/"
+          -- ,  [haskell]      ->> const ".Compte.Haskell/"
 
             -- Blackhole
           ,  mempty         ->> const "./"
