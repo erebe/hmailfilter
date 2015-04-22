@@ -1,112 +1,179 @@
 
+./dist/build/autogen/Paths_hMailFilter.hs,972
+module Paths_hMailFilter Paths_hMailFilter0,1
+catchIO catchIO11,12
+catchIO catchIO12,13
+version version14,15
+version version15,16
+bindir, libdir, datadir, libexecdir, sysconfdir sysconfdir16,17
+bindir, libdir, datadir, libexecdir,libexecdir16,17
+bindir, libdir, datadir,datadir16,17
+bindir, libdir,libdir16,17
+bindir,bindir16,17
+bindir bindir18,19
+libdir libdir19,20
+datadir datadir20,21
+libexecdir libexecdir21,22
+sysconfdir sysconfdir22,23
+getBinDir, getLibDir, getDataDir, getLibexecDir, getSysconfDir getSysconfDir24,25
+getBinDir, getLibDir, getDataDir, getLibexecDir,getLibexecDir24,25
+getBinDir, getLibDir, getDataDir,getDataDir24,25
+getBinDir, getLibDir,getLibDir24,25
+getBinDir,getBinDir24,25
+getBinDir getBinDir25,26
+getLibDir getLibDir26,27
+getDataDir getDataDir27,28
+getLibexecDir getLibexecDir28,29
+getSysconfDir getSysconfDir29,30
+getDataFileName getDataFileName31,32
+getDataFileName getDataFileName32,33
+
+./dist/dist-sandbox-af36632a/build/autogen/Paths_hMailFilter.hs,972
+module Paths_hMailFilter Paths_hMailFilter0,1
+catchIO catchIO11,12
+catchIO catchIO12,13
+version version14,15
+version version15,16
+bindir, libdir, datadir, libexecdir, sysconfdir sysconfdir16,17
+bindir, libdir, datadir, libexecdir,libexecdir16,17
+bindir, libdir, datadir,datadir16,17
+bindir, libdir,libdir16,17
+bindir,bindir16,17
+bindir bindir18,19
+libdir libdir19,20
+datadir datadir20,21
+libexecdir libexecdir21,22
+sysconfdir sysconfdir22,23
+getBinDir, getLibDir, getDataDir, getLibexecDir, getSysconfDir getSysconfDir24,25
+getBinDir, getLibDir, getDataDir, getLibexecDir,getLibexecDir24,25
+getBinDir, getLibDir, getDataDir,getDataDir24,25
+getBinDir, getLibDir,getLibDir24,25
+getBinDir,getBinDir24,25
+getBinDir getBinDir25,26
+getLibDir getLibDir26,27
+getDataDir getDataDir27,28
+getLibexecDir getLibexecDir28,29
+getSysconfDir getSysconfDir29,30
+getDataFileName getDataFileName31,32
+getDataFileName getDataFileName32,33
+
+./dist/dist-sandbox-af36632a/setup/setup.hs,19
+import import0,1
+
 ./Setup.hs,15
 main main1,2
 
-./src/Main.hs,767
-module Main Main2,3
-data HeaderName HeaderName9,10
-data HeaderName = ReturnPathReturnPath9,10
-                | OriginalToOriginalTo10,11
-                | DeliveredToDeliveredTo11,12
-                | ReceivedReceived12,13
-                | ContentTypeContentType13,14
-                | ThreadTopicThreadTopic14,15
-                | DateDate15,16
-                | SubjectSubject16,17
-                | FromFrom17,18
-                | ToTo18,19
-                | CcCc19,20
-                | BccBcc20,21
-data Header Header23,24
-data Header = Header Header23,24
-parseHeaderName parseHeaderName25,26
-parseHeaderName parseHeaderName26,27
-parseHeader parseHeader29,30
-parseHeader parseHeader30,31
-main main32,33
-main main33,34
+./src/flycheck_Main.hs,642
+module Main Main4,5
+virtualUser virtualUser17,18
+virtualUser virtualUser18,19
+deMoi deMoi29,30
+deMoi deMoi30,31
+pourMoi pourMoi32,33
+pourMoi pourMoi33,34
+pourDomaine pourDomaine35,36
+pourDomaine pourDomaine36,37
+atos atos38,39
+atos atos39,40
+famille famille41,42
+famille famille42,43
+haskell haskell44,45
+haskell haskell45,46
+wyplay wyplay47,48
+wyplay wyplay48,49
+insa insa50,51
+insa insa51,52
+orgaIF orgaIF53,54
+orgaIF orgaIF54,55
+bde bde56,57
+bde bde57,58
+devNull devNull59,60
+devNull devNull60,61
+tabulaRasa tabulaRasa62,63
+tabulaRasa tabulaRasa63,64
+main main65,66
+main main66,67
 
-./src/flycheck_Main.hs,767
-module Main Main2,3
-data HeaderName HeaderName9,10
-data HeaderName = ReturnPathReturnPath9,10
-                | OriginalToOriginalTo10,11
-                | DeliveredToDeliveredTo11,12
-                | ReceivedReceived12,13
-                | ContentTypeContentType13,14
-                | ThreadTopicThreadTopic14,15
-                | DateDate15,16
-                | SubjectSubject16,17
-                | FromFrom17,18
-                | ToTo18,19
-                | CcCc19,20
-                | BccBcc20,21
-data Header Header23,24
-data Header = Header Header23,24
-parseHeaderName parseHeaderName25,26
-parseHeaderName parseHeaderName26,27
-parseHeader parseHeader29,30
-parseHeader parseHeader30,31
-main main32,33
-main main33,34
+./src/Main.hs,642
+module Main Main4,5
+virtualUser virtualUser17,18
+virtualUser virtualUser18,19
+deMoi deMoi29,30
+deMoi deMoi30,31
+pourMoi pourMoi32,33
+pourMoi pourMoi33,34
+pourDomaine pourDomaine35,36
+pourDomaine pourDomaine36,37
+atos atos38,39
+atos atos39,40
+famille famille41,42
+famille famille42,43
+haskell haskell44,45
+haskell haskell45,46
+wyplay wyplay47,48
+wyplay wyplay48,49
+insa insa50,51
+insa insa51,52
+orgaIF orgaIF53,54
+orgaIF orgaIF54,55
+bde bde56,57
+bde bde57,58
+devNull devNull59,60
+devNull devNull60,61
+tabulaRasa tabulaRasa62,63
+tabulaRasa tabulaRasa63,64
+main main65,66
+main main66,67
 
-./dist/build/autogen/Paths_hprocmail.hs,968
-module Paths_hprocmail Paths_hprocmail0,1
-catchIO catchIO11,12
-catchIO catchIO12,13
-version version14,15
-version version15,16
-bindir, libdir, datadir, libexecdir, sysconfdir sysconfdir16,17
-bindir, libdir, datadir, libexecdir,libexecdir16,17
-bindir, libdir, datadir,datadir16,17
-bindir, libdir,libdir16,17
-bindir,bindir16,17
-bindir bindir18,19
-libdir libdir19,20
-datadir datadir20,21
-libexecdir libexecdir21,22
-sysconfdir sysconfdir22,23
-getBinDir, getLibDir, getDataDir, getLibexecDir, getSysconfDir getSysconfDir24,25
-getBinDir, getLibDir, getDataDir, getLibexecDir,getLibexecDir24,25
-getBinDir, getLibDir, getDataDir,getDataDir24,25
-getBinDir, getLibDir,getLibDir24,25
-getBinDir,getBinDir24,25
-getBinDir getBinDir25,26
-getLibDir getLibDir26,27
-getDataDir getDataDir27,28
-getLibexecDir getLibexecDir28,29
-getSysconfDir getSysconfDir29,30
-getDataFileName getDataFileName31,32
-getDataFileName getDataFileName32,33
+./src/Filter.hs,611
+newtype Match Match8,9
+newtype Match a = Match Match8,9
+newtype Match a = Match { doesMatch doesMatch8,9
+instance instance9,10
+data Filter Filter13,14
+data Filter = Filter Filter13,14
+data Filter = Filter { rules rules13,14
+                     , onMatch onMatch14,15
+(->>)->>17,18
+ms ms18,19
+runFilter runFilter20,21
+runFilter runFilter21,22
+for for27,28
+for for28,29
+from from36,37
+from from37,38
+subject subject42,43
+subject subject43,44
+originalTo originalTo48,49
+originalTo originalTo49,50
+anyOf anyOf54,55
+anyOf anyOf55,56
+allOf allOf57,58
+allOf allOf58,59
 
-./dist/dist-sandbox-473cb6ad/setup/setup.hs,19
-import import0,1
-
-./dist/dist-sandbox-473cb6ad/build/autogen/Paths_hprocmail.hs,968
-module Paths_hprocmail Paths_hprocmail0,1
-catchIO catchIO11,12
-catchIO catchIO12,13
-version version14,15
-version version15,16
-bindir, libdir, datadir, libexecdir, sysconfdir sysconfdir16,17
-bindir, libdir, datadir, libexecdir,libexecdir16,17
-bindir, libdir, datadir,datadir16,17
-bindir, libdir,libdir16,17
-bindir,bindir16,17
-bindir bindir18,19
-libdir libdir19,20
-datadir datadir20,21
-libexecdir libexecdir21,22
-sysconfdir sysconfdir22,23
-getBinDir, getLibDir, getDataDir, getLibexecDir, getSysconfDir getSysconfDir24,25
-getBinDir, getLibDir, getDataDir, getLibexecDir,getLibexecDir24,25
-getBinDir, getLibDir, getDataDir,getDataDir24,25
-getBinDir, getLibDir,getLibDir24,25
-getBinDir,getBinDir24,25
-getBinDir getBinDir25,26
-getLibDir getLibDir26,27
-getDataDir getDataDir27,28
-getLibexecDir getLibexecDir28,29
-getSysconfDir getSysconfDir29,30
-getDataFileName getDataFileName31,32
-getDataFileName getDataFileName32,33
+./src/Parser.hs,904
+module Parser Parser2,3
+data HeaderName HeaderName13,14
+data HeaderName = ReturnPathReturnPath13,14
+                | OriginalToOriginalTo14,15
+                | DeliveredToDeliveredTo15,16
+                | ReceivedReceived16,17
+                | ContentTypeContentType17,18
+                | ThreadTopicThreadTopic18,19
+                | DateDate19,20
+                | SubjectSubject20,21
+                | FromFrom21,22
+                | ToTo22,23
+                | CcCc23,24
+                | BccBcc24,25
+                | Unknown Unknown25,26
+data Header Header28,29
+data Header = Header Header28,29
+parseHeaderName parseHeaderName30,31
+parseHeaderName parseHeaderName31,32
+parseHeader parseHeader45,46
+parseHeader parseHeader46,47
+parseHeaders parseHeaders62,63
+parseHeaders parseHeaders63,64
+getHeaders getHeaders79,80
+getHeaders getHeaders80,81

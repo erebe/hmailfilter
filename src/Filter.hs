@@ -1,7 +1,10 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module Filter where
 
+import           ClassyPrelude         hiding (for, isInfixOf)
 import           Data.ByteString.Char8 hiding (all, any, find)
-import           Data.Monoid
+import           Data.Monoid           (Any (..))
 import           Parser
 
 
@@ -9,7 +12,7 @@ import           Parser
 newtype Match a = Match { doesMatch :: Header -> a }
 instance Monoid m => Monoid (Match m) where
     mempty = Match $ const mempty
-    mappend (Match f) (Match f') = Match (\h -> f h <> f' h)
+    mappend (Match f) (Match f') = Match (\h -> f h `mappend` f' h)
 
 data Filter = Filter { rules   :: [Match Any]
                      , onMatch :: [Header] -> ByteString

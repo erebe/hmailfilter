@@ -1,14 +1,12 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Parser where
 
-import           Control.Applicative              ((<|>))
-import           Control.Monad
+import           ClassyPrelude
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
 import           Data.ByteString.Char8
-import           Data.Monoid
-import           Prelude                          hiding (takeWhile)
 
 
 data HeaderName = ReturnPath

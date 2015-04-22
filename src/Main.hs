@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
@@ -6,27 +7,31 @@ module Main where
 import           Filter
 import           Parser
 
-import           Data.ByteString.Char8 hiding (all, any, find)
-import           Data.Char
-import           Data.List             (find)
-import           Data.Maybe
-import           Data.Monoid
-import           Prelude               hiding (dropWhile, elem, getContents,
-                                        head, map, null, putStrLn, reverse,
-                                        tail, takeWhile)
+import           ClassyPrelude         hiding (for)
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.Char             as C
+import           Data.Monoid           (Any)
+import qualified Text.Regex.PCRE.Light as Re
 
 
+mainUser :: ByteString
+mainUser = BC.pack "erebe"
+
+mainDomain :: ByteString
+mainDomain = BC.pack "erebe.eu"
+
+mainEmail :: ByteString
+mainEmail = BC.pack "erebe@erebe.eu"
 
 virtualUser :: [Header] -> ByteString
-virtualUser = capitalize . sanitize . extractUser . isFor
+virtualUser hs =  fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)
   where
-    isFor           = foldMap (doesMatch . for $ (\h -> if "@erebe.eu" `isInfixOf` h then [h] else mempty))
-    extractUser val = fst . breakSubstring "@erebe.eu" $ fromMaybe "erebe@erebe.eu" (listToMaybe val)
-    sanitize        = reverse . map (\c -> if isLetter c then toLower c else '_')
-                      . takeWhile (\c -> isLetter c || elem c "._") . reverse
-    capitalize str  = if not . null $ str
-                     then (singleton . toUpper $ head str) <> tail str
-                     else mempty
+    isFor           = foldMap (doesMatch . for $ (\h -> if ("@" <> mainDomain) `isInfixOf` h then [h] else mempty))
+    extractUser val = listToMaybe val >>= \s -> Re.match rPattern s [] >>= listToMaybe . drop 1
+    capitalize user = if not . null $ user
+                      then return $ (BC.singleton . C.toUpper $ BC.head user) <> BC.map C.toLower (BC.tail user)
+                      else mempty
+    rPattern        = Re.compile "([a-z._-]+)@" [Re.caseless]
 
 
 deMoi :: Match Any
@@ -67,11 +72,11 @@ tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 
 main :: IO ()
 main = do
-    hs <- getHeaders <$> getContents
+    hs <- getHeaders <$> BC.getContents
 
-    let outputPath = find (not . null) $ runFilter hs <$> filters
+    let outputPath = find (not . BC.null) $ runFilter hs <$> filters
     let path = fromMaybe "./" outputPath
-    putStrLn path
+    BC.putStrLn path
 
     where
       filters = [
