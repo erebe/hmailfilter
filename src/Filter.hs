@@ -1,10 +1,11 @@
 module Filter where
 
+import           Data.ByteString.Char8 hiding (all, any, find)
 import           Data.Monoid
-import Data.ByteString.Char8 hiding (any, all, find)           
-import Parser
+import           Parser
 
-  
+
+
 newtype Match a = Match { doesMatch :: Header -> a }
 instance Monoid m => Monoid (Match m) where
     mempty = Match $ const mempty
@@ -13,10 +14,10 @@ instance Monoid m => Monoid (Match m) where
 data Filter = Filter { rules   :: [Match Any]
                      , onMatch :: [Header] -> ByteString
                      }
- 
+
 (->>) :: [Match Any] -> ([Header] -> ByteString) -> Filter
 ms ->> f = Filter ms f
-            
+
 runFilter :: [Header] -> Filter -> ByteString
 runFilter hs (Filter rs onMatch') = if all (\m -> any (getAny . doesMatch m) hs) rs
                                       then onMatch' hs
@@ -50,7 +51,7 @@ originalTo f = Match $ \h ->
   case h of
    Header OriginalTo str -> f str
    _ -> mempty
-  
+
 anyOf :: [ByteString] -> ByteString -> Any
 anyOf oneOf m = Any $ any (`isInfixOf` m) oneOf
 

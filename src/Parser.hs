@@ -3,12 +3,13 @@
 module Parser where
 
 import           Control.Applicative              ((<|>))
-import           Data.Attoparsec.ByteString.Char8 as PC
-import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
-import           Data.ByteString.Char8            
 import           Control.Monad
-import           Prelude                          hiding (takeWhile)
+import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
+import           Data.Attoparsec.ByteString.Char8 as PC
+import           Data.ByteString.Char8
 import           Data.Monoid
+import           Prelude                          hiding (takeWhile)
+
 
 data HeaderName = ReturnPath
                 | OriginalTo
