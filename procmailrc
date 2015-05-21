@@ -1,0 +1,22 @@
+VERBOSE=off
+MAILDIR=$HOME/.maildir/
+PMDIR=$HOME/.procmail
+LOGFILE=$PMDIR/procmail.log
+
+
+INCLUDERC=$PMDIR/trash.rc
+
+:0 c
+* ^.*$
+| attachment-parser 
+
+
+DEST=`formail -X "" | hmailfilter`
+:0:
+* .
+$DEST
+
+:0:
+* .*$
+$MAILDIR
+

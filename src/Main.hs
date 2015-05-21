@@ -56,7 +56,7 @@ wyplay :: Match Any
 wyplay = for $ anyOf ["wyplay@erebe.eu"]
 
 insa :: Match Any
-insa = for $ anyOf ["@insa-lyon.fr", "@insalien.org", "@listes.insa-lyon.fr"]
+insa = for $ anyOf ["@led.insa-lyon.fr", "@insa-lyon.fr", "@insalien.org", "@listes.insa-lyon.fr"]
 
 orgaIF :: Match Any
 orgaIF = subject $ anyOf ["[BdE - Equipe Orga IF]"]
