@@ -23,8 +23,8 @@ ms ->> f = Filter ms f
 
 runFilter :: [Header] -> Filter -> ByteString
 runFilter hs (Filter rs onMatch') = if all (\m -> any (getAny . doesMatch m) hs) rs
-                                      then onMatch' hs
-                                      else mempty
+                                    then onMatch' hs
+                                    else mempty
 
 
 
@@ -53,6 +53,12 @@ originalTo :: Monoid m => (ByteString -> m) -> Match m
 originalTo f = Match $ \h ->
   case h of
    Header OriginalTo str -> f str
+   _ -> mempty
+
+mailingList :: Monoid m => (ByteString -> m) -> Match m
+mailingList f = Match $ \h ->
+  case h of
+   Header ListID str -> f str
    _ -> mempty
 
 anyOf :: [ByteString] -> ByteString -> Any

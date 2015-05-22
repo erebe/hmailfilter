@@ -49,9 +49,6 @@ atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net"]
 famille :: Match Any
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
-haskell :: Match Any
-haskell = for $ anyOf ["haskell@erebe.eu"]
-
 wyplay :: Match Any
 wyplay = for $ anyOf ["wyplay@erebe.eu"]
 
@@ -70,6 +67,15 @@ devNull = for $ anyOf ["devnull@"]
 tabulaRasa :: Match Any
 tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 
+haskell :: Match Any
+haskell = mailingList $ anyOf ["haskell"]
+
+haskellCafe :: Match Any
+haskellCafe = mailingList $ anyOf ["haskell-cafe"]
+
+haskellBeg :: Match Any
+haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
+
 main :: IO ()
 main = do
     hs <- getHeaders <$> BC.getContents
@@ -84,7 +90,11 @@ main = do
              [deMoi]        ->> const ".Moi/"
           ,  [famille]      ->> const ".Famille/"
 
-            --Professionnel
+            -- Mailing List
+          ,  [haskellCafe]  ->> const ".Mailing.Haskell-Cafe/"
+          ,  [haskellBeg]   ->> const ".Mailing.Haskell-Beginner/"
+
+            -- Professionnel
           ,  [atos]         ->> const ".Professionnel.Bull/"
           ,  [wyplay]       ->> const ".Professionnel.Wyplay/"
 
@@ -98,9 +108,6 @@ main = do
           ,  [devNull]      ->> const "/dev/null"
           ,  [tabulaRasa]   ->> const ".Compte.TabulaRasa/"
           ,  [pourDomaine]  ->> \hs -> ".Compte." <> virtualUser hs <> "/"
-
-            -- Mailing
-          -- ,  [haskell]      ->> const ".Compte.Haskell/"
 
             -- Blackhole
           ,  mempty         ->> const "./"

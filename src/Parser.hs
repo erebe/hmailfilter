@@ -6,7 +6,6 @@ module Parser where
 import           ClassyPrelude
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
-import           Data.ByteString.Char8
 
 
 data HeaderName = ReturnPath
@@ -21,6 +20,7 @@ data HeaderName = ReturnPath
                 | To
                 | Cc
                 | Bcc
+                | ListID
                 | Unknown ByteString
                 deriving (Show, Read)
 
@@ -39,6 +39,7 @@ parseHeaderName =     ("Return-Path"   >> return ReturnPath)
                   <|> ("To"            >> return To)
                   <|> ("CC"            >> return Cc)
                   <|> ("BCC"           >> return Bcc)
+                  <|> ("List-Id"       >> return ListID)
                   <|> liftM Unknown (PC.takeWhile (\c -> c /= '\r' && c /= ':'))
 
 parseHeader :: Parser Header
