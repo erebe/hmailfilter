@@ -6,6 +6,7 @@ module Parser where
 import           ClassyPrelude
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
+import           Data.ByteString.Char8            as BC
 
 
 data HeaderName = ReturnPath
@@ -27,25 +28,27 @@ data HeaderName = ReturnPath
 data Header = Header HeaderName ByteString deriving (Show, Read)
 
 parseHeaderName :: Parser HeaderName
-parseHeaderName =     ("Return-Path"   >> return ReturnPath)
-                  <|> ("X-Original-To" >> return OriginalTo)
-                  <|> ("Delivered-To"  >> return DeliveredTo)
-                  <|> ("Received"      >> return Received)
-                  <|> ("Content-Type"  >> return ContentType)
-                  <|> ("Thread-Topic"  >> return ThreadTopic)
-                  <|> ("Date"          >> return Date)
-                  <|> ("Subject"       >> return Subject)
-                  <|> ("From"          >> return From)
-                  <|> ("To"            >> return To)
-                  <|> ("CC"            >> return Cc)
-                  <|> ("BCC"           >> return Bcc)
-                  <|> ("List-Id"       >> return ListID)
-                  <|> liftM Unknown (PC.takeWhile (\c -> c /= '\r' && c /= ':'))
+parseHeaderName =     ("Return-Path:"   >> return ReturnPath)
+                  <|> ("X-Original-To:" >> return OriginalTo)
+                  <|> ("Delivered-To:"  >> return DeliveredTo)
+                  <|> ("Received:"      >> return Received)
+                  <|> ("Content-Type:"  >> return ContentType)
+                  <|> ("Thread-Topic:"  >> return ThreadTopic)
+                  <|> ("Date:"          >> return Date)
+                  <|> ("Subject:"       >> return Subject)
+                  <|> ("From:"          >> return From)
+                  <|> ("To:"            >> return To)
+                  <|> ("CC:"            >> return Cc)
+                  <|> ("BCC:"           >> return Bcc)
+                  <|> ("List-Id:"       >> return ListID)
+                  <|> do
+                        val <- PC.takeWhile (`onotElem` asString "\r\n:")
+                        _ <- char ':'
+                        return $ Unknown (BC.init val)
 
 parseHeader :: Parser Header
 parseHeader = do
     header <- parseHeaderName
-    _ <- char ':'
     value <- takeValue
     return $ Header header value
 
