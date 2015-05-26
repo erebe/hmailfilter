@@ -54,8 +54,8 @@ parseHeader = do
         P.skipWhile isHorizontalSpace
         value <- P.takeTill isEndOfLine
         P.skipWhile isEndOfLine
-        next <- P.peekWord8'
-        if isHorizontalSpace next
+        next <- P.peekWord8
+        if fromMaybe False (isHorizontalSpace <$> next)
         then takeValue >>= \after -> return $ value <> " " <> after
         else return value
 
