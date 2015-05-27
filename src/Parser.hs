@@ -6,7 +6,7 @@ module Parser where
 import           ClassyPrelude
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
-import           Data.ByteString.Char8            as BC
+import           Data.Attoparsec.ByteString.Lazy  as PL
 
 
 data HeaderName = ReturnPath
@@ -44,7 +44,7 @@ parseHeaderName =     ("Return-Path:"   >> return ReturnPath)
                   <|> do
                         val <- PC.takeWhile (`onotElem` asString "\r\n:")
                         _ <- char ':'
-                        return $ Unknown (BC.init val)
+                        return $ Unknown val
 
 parseHeader :: Parser Header
 parseHeader = do
@@ -56,7 +56,7 @@ parseHeader = do
       takeValue = do
         P.skipWhile isHorizontalSpace
         value <- P.takeTill isEndOfLine
-        P.skipWhile isEndOfLine
+        _ <- string "\r\n" <|> string "\n"
         next <- P.peekWord8
         if fromMaybe False (isHorizontalSpace <$> next)
         then takeValue >>= \after -> return $ value <> " " <> after
@@ -65,8 +65,8 @@ parseHeader = do
 parseHeaders :: Parser [Header]
 parseHeaders = do
     headers <- many' parseHeader
-    isEnd <- atEnd
-    if isEnd
+    next <- P.peekWord8
+    if fromMaybe True (isEndOfLine <$> next)
     then return headers
     else do
        skipUnknownStuff
@@ -79,5 +79,5 @@ parseHeaders = do
         P.skipWhile isEndOfLine
         return ()
 
-getHeaders :: ByteString -> [Header]
-getHeaders str = either (const []) id (parseOnly parseHeaders str)
+getHeaders :: LByteString -> [Header]
+getHeaders str = fromMaybe [] (PL.maybeResult $ PL.parse parseHeaders str)

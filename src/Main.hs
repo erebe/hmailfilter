@@ -9,6 +9,7 @@ import           Parser
 
 import           ClassyPrelude         hiding (for)
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
 import           Data.Monoid           (Any)
 import qualified Text.Regex.PCRE.Light as Re
@@ -78,7 +79,7 @@ haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
 main :: IO ()
 main = do
-    hs <- getHeaders <$> BC.getContents
+    hs <- getHeaders <$> BL.getContents
 
     let outputPath = find (not . BC.null) $ runFilter hs <$> filters
     let path = fromMaybe "./" outputPath
