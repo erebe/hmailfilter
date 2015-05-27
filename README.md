@@ -24,12 +24,16 @@ $DEST
 ## How to run ? 
 ##### To install (only once):
 1. cabal sandbox init
-2. Edit your rules
-3. cabal install
+2. Edit your rules in src/Main.hs
+3. cabal install -j
 4. sudo cp .cabal-sandbox/bin/hmailfilter /usr/local/bin
 
 ##### Now to run: 
 1. Edit your procmailrc and use procmail to run the mail filter
 
+##### Todo: 
+1. Replace header list with a hashMap
+2. Add tests with real data and not random
+3. Mesure performance with criterion
 
 
