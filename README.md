@@ -31,7 +31,7 @@ $DEST
 ##### Now to run: 
 1. Edit your procmailrc and use procmail to run the mail filter
 
-##### Todo: 
+## Todo: 
 1. Replace header list with a hashMap
 2. Add tests with real data and not random
 3. Mesure performance with criterion
