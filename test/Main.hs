@@ -29,5 +29,14 @@ validateHeaderParser :: Property
 validateHeaderParser = forAll genHeader $ \h ->
   either (const False) (const True) (parseOnly parseHeader h)
 
+genHeaders :: Gen ByteString
+genHeaders = do
+    hs <- ofoldMap id <$> listOf genHeader
+    return $ hs <> "\r\n"
+
+validateHeadersParser :: Property
+validateHeadersParser = forAll genHeaders $ \h ->
+  either (const False) (const True) (parseOnly parseHeaders h)
+  
 main :: IO ()
-main = quickCheckWith stdArgs {maxSuccess = 5000 } validateHeaderParser
+main = mapM_ (quickCheckWith stdArgs {maxSuccess = 1000 }) [validateHeaderParser, validateHeadersParser]
