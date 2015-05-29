@@ -15,11 +15,13 @@ let rules = [  --If all Filters Match  then move email to this Dir
 
 and procmailrc example in procmailrc file
 ```bash
-DEST=`formail -X "" | hmailfilter`
+DEST=`hmailfilter`
 :0:
 * .
 $DEST
 ```
+## What to expect
+1. Can parse a 62M header only email, without an flinch
 
 ## How to run ? 
 ##### To install (only once):
@@ -32,8 +34,6 @@ $DEST
 1. Edit your procmailrc and use procmail to run the mail filter
 
 ## Todo 
-1. Replace header list with a hashMap
-2. Add tests with real data and not random
-3. Mesure performance with criterion
+1. Replace header list with a hashMap (Maybe)
 
 
