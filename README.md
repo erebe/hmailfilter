@@ -3,7 +3,20 @@
 Managing rules with procmail is too cumbersome for me (specially if genericty is required)
 So instead this programme with parse email headers, use the associated rules, and print the destination folder for procmail.
 
-You can see rule example in src/Main.hs
+You can see rule and filters examples in src/Main.
+
+Filter examples
+```haskell
+tabulaRasa :: Match Any
+tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
+
+haskellCafe :: Match Any
+haskellCafe = mailingList $ anyOf ["haskell-cafe"]
+
+haskellBeg :: Match Any
+haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
+```
+Rule examples
 ```haskell
 let rules = [  --If all Filters Match  then move email to this Dir  
             ,  [pourMoi]      ->> const "./"
