@@ -9,10 +9,9 @@ import           Data.Attoparsec.ByteString.Char8 as PC
 import           Data.Attoparsec.ByteString.Lazy  as PL
 import           Data.ByteString.Base64           as B64 hiding (decode)
 import           Data.ByteString.Char8            (split)
-import           Data.List                        (init, tail)
-import           Data.Text.Encoding               as T
-import           Data.Text.Encoding.Error         as T
-
+import qualified Data.Text.Encoding               as T
+import qualified Data.Text.Encoding.Error         as T
+import qualified Text.Regex.PCRE.Light            as Re
 
 data HeaderName = ReturnPath
                 | OriginalTo
@@ -52,15 +51,28 @@ parseHeaderName =     ("Return-Path:"   >> return ReturnPath)
                         return $ Unknown (T.decodeUtf8With T.ignore val)
 
 decode :: ByteString -> Maybe Text
-decode str = if isPrefixOf "=?" str && isSuffixOf "?=" str
-             then decode' . tail . init $ split '?' str
-             else Nothing
+decode str = do
+    [_,h,m,t] <- Re.match rx str []
 
+    return $ T.decodeUtf8With T.ignore h
+          <> decode' (split '?' m)
+          <> T.decodeUtf8With T.ignore t
     where
-      decode' ["UTF-8", "B", payload] = Just $ T.decodeUtf8With T.ignore (B64.decodeLenient payload)
-      decode' ["UTF-16", "B", payload] = Just $ T.decodeUtf16LEWith T.ignore (B64.decodeLenient payload)
-      decode' ["UTF-32", "B", payload] = Just $ T.decodeUtf32LEWith T.ignore (B64.decodeLenient payload)
-      decode' _ = Nothing
+      rx = Re.compile "^(.*?)=\\?(.*?)\\?=(.*)$" [Re.caseless]
+      decode' [charset, encoding, payload] =
+        let decrypt = if encoding == "B" then B64.decodeLenient else id in
+        let charsetDecode = case charset of
+                                "UTF-8"  -> T.decodeUtf8With T.ignore
+                                "utf-8"  -> T.decodeUtf8With T.ignore
+                                "UTF-16" -> T.decodeUtf16LEWith T.ignore
+                                "utf-16" -> T.decodeUtf16LEWith T.ignore
+                                "UTF-32" -> T.decodeUtf32LEWith T.ignore
+                                "utf-32" -> T.decodeUtf32LEWith T.ignore
+                                _ -> T.decodeUtf8With T.ignore
+                              in
+       charsetDecode . decrypt $ payload
+
+      decode' str = T.decodeUtf8With T.ignore $ ofoldMap id str
 
 parseHeader :: Parser Header
 parseHeader = do
