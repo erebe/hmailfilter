@@ -2,9 +2,9 @@
 
 module Filter where
 
-import           ClassyPrelude         hiding (for, isInfixOf)
-import           Data.ByteString.Char8 hiding (all, any, find)
-import           Data.Monoid           (Any (..))
+import           ClassyPrelude hiding (for, isInfixOf)
+import           Data.Monoid   (Any (..))
+import           Data.Text     hiding (all, any, find)
 import           Parser
 
 
@@ -28,7 +28,7 @@ runFilter hs (Filter rs onMatch') = if all (\m -> any (getAny . doesMatch m) hs)
 
 
 
-for :: Monoid m => (ByteString -> m) -> Match m
+for :: Monoid m => (Text -> m) -> Match m
 for f = Match $ \header ->
   case header of
    Header OriginalTo str -> f str
@@ -37,32 +37,32 @@ for f = Match $ \header ->
    Header Bcc str        -> f str
    _ -> mempty
 
-from :: Monoid m => (ByteString -> m) -> Match m
+from :: Monoid m => (Text -> m) -> Match m
 from f = Match $ \header ->
   case header of
    Header From str -> f str
    _ -> mempty
 
-subject :: Monoid m => (ByteString -> m) -> Match m
+subject :: Monoid m => (Text -> m) -> Match m
 subject f = Match $ \header ->
   case header of
    Header Subject str -> f str
    _ -> mempty
 
-originalTo :: Monoid m => (ByteString -> m) -> Match m
+originalTo :: Monoid m => (Text -> m) -> Match m
 originalTo f = Match $ \h ->
   case h of
    Header OriginalTo str -> f str
    _ -> mempty
 
-mailingList :: Monoid m => (ByteString -> m) -> Match m
+mailingList :: Monoid m => (Text -> m) -> Match m
 mailingList f = Match $ \h ->
   case h of
    Header ListID str -> f str
    _ -> mempty
 
-anyOf :: [ByteString] -> ByteString -> Any
+anyOf :: [Text] -> Text -> Any
 anyOf oneOf m = Any $ any (`isInfixOf` m) oneOf
 
-allOf :: [ByteString] -> ByteString -> Any
+allOf :: [Text] -> Text -> Any
 allOf oneOf m = Any $ all (`isInfixOf` m) oneOf

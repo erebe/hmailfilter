@@ -3,10 +3,15 @@
 
 module Parser where
 
-import           ClassyPrelude
+import           ClassyPrelude                    hiding (foldMap)
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
 import           Data.Attoparsec.ByteString.Lazy  as PL
+import           Data.ByteString.Base64           as B64 hiding (decode)
+import           Data.ByteString.Char8            (split)
+import           Data.List                        (init, tail)
+import           Data.Text.Encoding               as T
+import           Data.Text.Encoding.Error         as T
 
 
 data HeaderName = ReturnPath
@@ -22,10 +27,10 @@ data HeaderName = ReturnPath
                 | Cc
                 | Bcc
                 | ListID
-                | Unknown ByteString
+                | Unknown Text
                 deriving (Show, Read)
 
-data Header = Header HeaderName ByteString deriving (Show, Read)
+data Header = Header HeaderName Text deriving (Show, Read)
 
 parseHeaderName :: Parser HeaderName
 parseHeaderName =     ("Return-Path:"   >> return ReturnPath)
@@ -44,13 +49,24 @@ parseHeaderName =     ("Return-Path:"   >> return ReturnPath)
                   <|> do
                         val <- PC.takeWhile (`onotElem` asString "\r\n:")
                         _ <- char ':'
-                        return $ Unknown val
+                        return $ Unknown (T.decodeUtf8With T.ignore val)
+
+decode :: ByteString -> Maybe Text
+decode str = if isPrefixOf "=?" str && isSuffixOf "?=" str
+             then decode' . tail . init $ split '?' str
+             else Nothing
+
+    where
+      decode' ["UTF-8", "B", payload] = Just $ T.decodeUtf8With T.ignore (B64.decodeLenient payload)
+      decode' ["UTF-16", "B", payload] = Just $ T.decodeUtf16LEWith T.ignore (B64.decodeLenient payload)
+      decode' ["UTF-32", "B", payload] = Just $ T.decodeUtf32LEWith T.ignore (B64.decodeLenient payload)
+      decode' _ = Nothing
 
 parseHeader :: Parser Header
 parseHeader = do
     header <- parseHeaderName
     value <- takeValue
-    return $ Header header value
+    return $ Header header (fromMaybe (T.decodeUtf8 value) (decode value))
 
     where
       takeValue = do

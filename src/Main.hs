@@ -12,23 +12,20 @@ import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
 import           Data.Monoid           (Any)
+import qualified Data.Text.Encoding    as T
 import qualified Text.Regex.PCRE.Light as Re
 
 
-mainUser :: ByteString
-mainUser = BC.pack "erebe"
-
-mainDomain :: ByteString
-mainDomain = BC.pack "erebe.eu"
-
-mainEmail :: ByteString
-mainEmail = BC.pack "erebe@erebe.eu"
+mainUser, mainDomain, mainEmail :: IsString a => a
+mainUser = "erebe"
+mainDomain = "erebe.eu"
+mainEmail = "erebe@erebe.eu"
 
 virtualUser :: [Header] -> ByteString
 virtualUser hs =  fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)
   where
     isFor           = foldMap (doesMatch . for $ (\h -> if ("@" <> mainDomain) `isInfixOf` h then [h] else mempty))
-    extractUser val = listToMaybe val >>= \s -> Re.match rPattern s [] >>= listToMaybe . drop 1
+    extractUser val = listToMaybe val >>= \s -> Re.match rPattern (T.encodeUtf8 s) [] >>= listToMaybe . drop 1
     capitalize user = if not . null $ user
                       then return $ (BC.singleton . C.toUpper $ BC.head user) <> BC.map C.toLower (BC.tail user)
                       else mempty
@@ -72,7 +69,7 @@ haskell :: Match Any
 haskell = mailingList $ anyOf ["haskell"]
 
 haskellCafe :: Match Any
-haskellCafe = mailingList $ anyOf ["haskell-cafe"]
+haskellCafe = mailingList $ anyOf ["haskell-cafe" ]
 
 haskellBeg :: Match Any
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
@@ -113,4 +110,3 @@ main = do
             -- Blackhole
           ,  mempty         ->> const "./"
           ]
-
