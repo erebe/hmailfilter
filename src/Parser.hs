@@ -8,7 +8,8 @@ import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
 import           Data.Attoparsec.ByteString.Lazy  as PL
 import           Data.ByteString.Base64           as B64 hiding (decode)
-import           Data.ByteString.Char8            (split)
+import qualified Data.ByteString.Char8            as BC
+import qualified Data.Char                        as C
 import qualified Data.Text.Encoding               as T
 import qualified Data.Text.Encoding.Error         as T
 import qualified Text.Regex.PCRE.Light            as Re
@@ -50,35 +51,31 @@ parseHeaderName =     ("Return-Path:"   >> return ReturnPath)
                         _ <- char ':'
                         return $ Unknown (T.decodeUtf8With T.ignore val)
 
-decode :: ByteString -> Maybe Text
-decode str = do
-    [_,h,m,t] <- Re.match rx str []
+parseHeaderValue :: ByteString -> Text
+parseHeaderValue str = fromMaybe (T.decodeUtf8 str) $ do
+    [_,h, charset, encoding, payload, t] <- Re.match rx str []
 
-    return $ T.decodeUtf8With T.ignore h
-          <> decode' (split '?' m)
-          <> T.decodeUtf8With T.ignore t
+    return $ T.decodeUtf8 h
+           <> (decodeCharset charset . decodeEncoding encoding $ payload)
+           <> parseHeaderValue t
+
     where
-      rx = Re.compile "^(.*?)=\\?(.*?)\\?=(.*)$" [Re.caseless]
-      decode' [charset, encoding, payload] =
-        let decrypt = if encoding == "B" then B64.decodeLenient else id in
-        let charsetDecode = case charset of
-                                "UTF-8"  -> T.decodeUtf8With T.ignore
-                                "utf-8"  -> T.decodeUtf8With T.ignore
-                                "UTF-16" -> T.decodeUtf16LEWith T.ignore
-                                "utf-16" -> T.decodeUtf16LEWith T.ignore
-                                "UTF-32" -> T.decodeUtf32LEWith T.ignore
-                                "utf-32" -> T.decodeUtf32LEWith T.ignore
-                                _ -> T.decodeUtf8With T.ignore
-                              in
-       charsetDecode . decrypt $ payload
-
-      decode' str = T.decodeUtf8With T.ignore $ ofoldMap id str
+      decodeEncoding en = if BC.map C.toUpper en == "B" then B64.decodeLenient else id
+      decodeCharset ch = case BC.map C.toUpper ch of
+                          "UTF-8"  -> T.decodeUtf8With T.ignore
+                          "UTF-16" -> T.decodeUtf16LEWith T.ignore
+                          "UTF-32" -> T.decodeUtf32LEWith T.ignore
+                          "ISO-8859-1" -> T.decodeLatin1
+                          _ -> T.decodeUtf8With T.ignore
+      rx = flip Re.compile [Re.caseless] $ "^(.*?)=\\?"
+                                        <> "([^\\?]+)\\?([QB])\\?(.*?)\\?="
+                                        <> "(.*)$"
 
 parseHeader :: Parser Header
 parseHeader = do
     header <- parseHeaderName
     value <- takeValue
-    return $ Header header (fromMaybe (T.decodeUtf8 value) (decode value))
+    return $ Header header (parseHeaderValue value)
 
     where
       takeValue = do
