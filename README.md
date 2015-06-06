@@ -35,6 +35,7 @@ $DEST
 ```
 ## What to expect
 1. Can parse a 62M header only email, without an flinch
+2. Parse header value that is encoded (Ex: =?UTF-8?B?ABB?=)
 
 ## How to run ? 
 ##### To install (only once):
