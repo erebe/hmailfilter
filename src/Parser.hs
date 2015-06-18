@@ -33,23 +33,38 @@ data HeaderName = ReturnPath
 data Header = Header HeaderName Text deriving (Show, Read)
 
 parseHeaderName :: Parser HeaderName
-parseHeaderName =     ("Return-Path:"   >> return ReturnPath)
-                  <|> ("X-Original-To:" >> return OriginalTo)
-                  <|> ("Delivered-To:"  >> return DeliveredTo)
-                  <|> ("Received:"      >> return Received)
-                  <|> ("Content-Type:"  >> return ContentType)
-                  <|> ("Thread-Topic:"  >> return ThreadTopic)
-                  <|> ("Date:"          >> return Date)
-                  <|> ("Subject:"       >> return Subject)
-                  <|> ("From:"          >> return From)
-                  <|> ("To:"            >> return To)
-                  <|> ("Cc:"            >> return Cc)
-                  <|> ("Bcc:"           >> return Bcc)
-                  <|> ("List-Id:"       >> return ListID)
+parseHeaderName =     (stringCI "Return-Path:"   >> return ReturnPath)
+                  <|> (stringCI "X-Original-To:" >> return OriginalTo)
+                  <|> (stringCI "Delivered-To:"  >> return DeliveredTo)
+                  <|> (stringCI "Received:"      >> return Received)
+                  <|> (stringCI "Content-Type:"  >> return ContentType)
+                  <|> (stringCI "Thread-Topic:"  >> return ThreadTopic)
+                  <|> (stringCI "Date:"          >> return Date)
+                  <|> (stringCI "Subject:"       >> return Subject)
+                  <|> (stringCI "From:"          >> return From)
+                  <|> (stringCI "To:"            >> return To)
+                  <|> (stringCI "Cc:"            >> return Cc)
+                  <|> (stringCI "Bcc:"           >> return Bcc)
+                  <|> (stringCI "List-Id:"       >> return ListID)
                   <|> do
                         val <- PC.takeWhile (`onotElem` asString "\r\n:")
                         _ <- char ':'
                         return $ Unknown (T.decodeUtf8With T.ignore val)
+
+parseQEncodedWord :: Parser ByteString
+parseQEncodedWord = do
+    value <-     (char '_' >> return " ")
+             <|> (char '=' >> do
+               hex <- P.take 2
+               let ret = parseOnly hexadecimal hex
+               return $ either (const hex) singleton ret)
+             <|> PC.takeTill (PC.inClass "=_")
+
+    if BC.null value
+    then mempty
+    else return value
+
+
 
 parseHeaderValue :: ByteString -> Text
 parseHeaderValue str = fromMaybe (T.decodeUtf8 str) $ do
@@ -60,7 +75,10 @@ parseHeaderValue str = fromMaybe (T.decodeUtf8 str) $ do
            <> parseHeaderValue t
 
     where
-      decodeEncoding en = if BC.map C.toUpper en == "B" then B64.decodeLenient else id
+      decodeEncoding en = if BC.map C.toUpper en == "B"
+                          then B64.decodeLenient
+                          else \str' -> either (const str') concat
+                                        (parseOnly (many1 parseQEncodedWord) str')
       decodeCharset ch = case BC.map C.toUpper ch of
                           "UTF-8"  -> T.decodeUtf8With T.ignore
                           "UTF-16" -> T.decodeUtf16LEWith T.ignore
@@ -81,7 +99,7 @@ parseHeader = do
       takeValue = do
         P.skipWhile isHorizontalSpace
         value <- P.takeTill isEndOfLine
-        _ <- string "\r\n" <|> string "\n"
+        _ <- endOfLine
         next <- P.peekWord8
         if fromMaybe False (isHorizontalSpace <$> next)
         then takeValue >>= \after -> return $ value <> " " <> after
