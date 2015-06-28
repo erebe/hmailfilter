@@ -74,6 +74,9 @@ haskellCafe = mailingList $ anyOf ["haskell-cafe" ]
 haskellBeg :: Match Any
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
+blacklist :: Match Any
+blacklist = from $ anyOf [".Meds="]
+
 main :: IO ()
 main = do
     hs <- getHeaders <$> BL.getContents
@@ -84,8 +87,11 @@ main = do
 
     where
       filters = [
+            -- Blacklist
+             [blacklist]    ->> const "/dev/null"
+
             -- Perso
-             [deMoi]        ->> const ".Moi/"
+          ,  [deMoi]        ->> const ".Moi/"
           ,  [famille]      ->> const ".Famille/"
 
             -- Mailing List
@@ -94,6 +100,8 @@ main = do
 
             -- Professionnel
           ,  [atos]         ->> const ".Professionnel.Bull/"
+          ,  [wyplay, subject.anyOf $ ["[Cabale]", "[Detente]"]]       ->> const ".Professionnel.Wyplay.Detente/"
+          ,  [wyplay, subject.anyOf $ ["[Alarme]"]]       ->> const "/dev/null"
           ,  [wyplay]       ->> const ".Professionnel.Wyplay/"
 
             -- Scolarité
