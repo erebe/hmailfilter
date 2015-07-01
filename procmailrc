@@ -6,16 +6,32 @@ LOGFILE=$PMDIR/procmail.log
 
 INCLUDERC=$PMDIR/trash.rc
 
+
 :0 c
 * ^.*$
 | attachment-parser 
 
+# Call hmailfilter program to determine 
+# in which folder does belong the mail
+DEST=`hmailfilter`
 
-DEST=`formail -X "" | hmailfilter`
+# Unified view for mobile
+# A cronjob is responsible to clean the folder periodically
+# doveadm expunge -u erebe mailbox inbox savedbefore 3d
+# Avoid mailling mails and blacklisted ones !
+:0 c
+* ! DEST ?? (\.Mailing|/null)
+./
+
+# Actually store the mail in the 
+# folder determined by hmailfilter
 :0:
 * .
 $DEST
 
+
+# Should not happen, but in case
+# default everything to the mailbox
 :0:
 * .*$
 $MAILDIR

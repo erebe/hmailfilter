@@ -82,10 +82,11 @@ main = do
     hs <- getHeaders <$> BL.getContents
 
     let outputPath = find (not . BC.null) $ runFilter hs <$> filters
-    let path = fromMaybe "./" outputPath
+    let path = fromMaybe defaultMailbox outputPath
     BC.putStrLn path
 
     where
+      defaultMailbox = ".Alpha/"
       filters = [
             -- Blacklist
              [blacklist]    ->> const "/dev/null"
@@ -110,11 +111,11 @@ main = do
           ,  [insa]         ->> const ".Scolarite.INSA/"
 
             -- ToMe
-          ,  [pourMoi]      ->> const "./"
+          ,  [pourMoi]      ->> const defaultMailbox
           ,  [devNull]      ->> const "/dev/null"
           ,  [tabulaRasa]   ->> const ".Compte.TabulaRasa/"
           ,  [pourDomaine]  ->> \hs -> ".Compte." <> virtualUser hs <> "/"
 
             -- Blackhole
-          ,  mempty         ->> const "./"
+          ,  mempty         ->> const defaultMailbox
           ]
