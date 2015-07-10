@@ -75,7 +75,8 @@ haskellBeg :: Match Any
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
 blacklist :: Match Any
-blacklist = from $ anyOf [".Meds="]
+blacklist =    (from $ anyOf [".Meds="])
+            <> (for $ anyOf ["mediapart@"])
 
 main :: IO ()
 main = do

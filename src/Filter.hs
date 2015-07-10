@@ -10,6 +10,9 @@ import           Parser
 
 
 newtype Match a = Match { doesMatch :: Header -> a }
+instance Monoid m => Semigroup (Match m) where
+    (<>) = mappend
+
 instance Monoid m => Monoid (Match m) where
     mempty = Match $ const mempty
     mappend (Match f) (Match f') = Match (\h -> f h `mappend` f' h)
