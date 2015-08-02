@@ -102,8 +102,6 @@ main = do
 
             -- Professionnel
           ,  [atos]         ->> const ".Professionnel.Bull/"
-          ,  [wyplay, subject.anyOf $ ["[Cabale]", "[Detente]"]]       ->> const ".Professionnel.Wyplay.Detente/"
-          ,  [wyplay, subject.anyOf $ ["[Alarme]"]]       ->> const "/dev/null"
           ,  [wyplay]       ->> const ".Professionnel.Wyplay/"
 
             -- Scolarité
