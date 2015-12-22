@@ -17,9 +17,9 @@ import qualified Text.Regex.PCRE.Light as Re
 
 
 mainUser, mainDomain, mainEmail :: IsString a => a
-mainUser = "erebe"
+mainUser   = "erebe"
 mainDomain = "erebe.eu"
-mainEmail = "erebe@erebe.eu"
+mainEmail  = "erebe@erebe.eu"
 
 virtualUser :: [Header] -> ByteString
 virtualUser hs =  fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)

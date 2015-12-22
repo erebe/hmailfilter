@@ -1,4 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TypeFamilies      #-}
+
 
 module Filter where
 
@@ -22,50 +24,35 @@ data Filter = Filter { rules   :: [Match Any]
                      }
 
 (->>) :: [Match Any] -> ([Header] -> ByteString) -> Filter
-ms ->> f = Filter ms f
+ruless ->> onMatchF = Filter ruless onMatchF
 
 runFilter :: [Header] -> Filter -> ByteString
-runFilter hs (Filter rs onMatch') = if all (\m -> any (getAny . doesMatch m) hs) rs
-                                    then onMatch' hs
-                                    else mempty
+runFilter hs (Filter rs onMatch')
+  | all (\rule -> any (getAny . doesMatch rule) hs) rs = onMatch' hs
+  | otherwise = mempty
 
-
+match :: Monoid m => [HeaderName] -> (Text -> m) -> Header -> m
+match validHeaders f (Header headerName str)
+  | headerName `elem` validHeaders = f str
+  | otherwise = mempty
 
 for :: Monoid m => (Text -> m) -> Match m
-for f = Match $ \header ->
-  case header of
-   Header OriginalTo str -> f str
-   Header To str         -> f str
-   Header Cc str         -> f str
-   Header Bcc str        -> f str
-   _ -> mempty
+for = Match . match [OriginalTo, To, Cc, Bcc]
 
 from :: Monoid m => (Text -> m) -> Match m
-from f = Match $ \header ->
-  case header of
-   Header From str -> f str
-   _ -> mempty
+from = Match . match [From]
 
 subject :: Monoid m => (Text -> m) -> Match m
-subject f = Match $ \header ->
-  case header of
-   Header Subject str -> f str
-   _ -> mempty
+subject = Match . match [Subject]
 
 originalTo :: Monoid m => (Text -> m) -> Match m
-originalTo f = Match $ \h ->
-  case h of
-   Header OriginalTo str -> f str
-   _ -> mempty
+originalTo = Match . match [OriginalTo]
 
 mailingList :: Monoid m => (Text -> m) -> Match m
-mailingList f = Match $ \h ->
-  case h of
-   Header ListID str -> f str
-   _ -> mempty
+mailingList = Match . match [ListID]
 
-anyOf :: [Text] -> Text -> Any
+anyOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Any
 anyOf oneOf m = Any $ any (`isInfixOf` m) oneOf
 
-allOf :: [Text] -> Text -> Any
+allOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Any
 allOf oneOf m = Any $ all (`isInfixOf` m) oneOf

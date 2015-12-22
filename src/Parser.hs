@@ -28,7 +28,7 @@ data HeaderName = ReturnPath
                 | Bcc
                 | ListID
                 | Unknown Text
-                deriving (Show, Read)
+                deriving (Show, Read, Eq)
 
 data Header = Header HeaderName Text deriving (Show, Read)
 
