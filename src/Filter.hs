@@ -11,48 +11,48 @@ import           Parser
 
 
 
-newtype Match a = Match { doesMatch :: Header -> a }
-instance Monoid m => Semigroup (Match m) where
+newtype Rule = Rule { doesMatch :: Header -> Any }
+instance Semigroup Rule where
     (<>) = mappend
 
-instance Monoid m => Monoid (Match m) where
-    mempty = Match $ const mempty
-    mappend (Match f) (Match f') = Match (\h -> f h `mappend` f' h)
+instance Monoid Rule where
+    mempty = Rule $ const mempty
+    mappend (Rule f) (Rule f') = Rule (\h -> f h `mappend` f' h)
 
-data Filter = Filter { rules   :: [Match Any]
-                     , onMatch :: [Header] -> ByteString
+data Filter = Filter { rules  :: [Rule]
+                     , onRule :: [Header] -> Text
                      }
 
-(->>) :: [Match Any] -> ([Header] -> ByteString) -> Filter
-ruless ->> onMatchF = Filter ruless onMatchF
+(->>) :: [Rule] -> ([Header] -> Text) -> Filter
+ruless ->> onRuleF = Filter ruless onRuleF
 
-runFilter :: [Header] -> Filter -> ByteString
-runFilter hs (Filter rs onMatch')
-  | all (\rule -> any (getAny . doesMatch rule) hs) rs = onMatch' hs
+runFilter :: [Header] -> Filter -> Text
+runFilter hs (Filter rs onRule')
+  | all (\rule -> any (getAny . doesMatch rule) hs) rs = onRule' hs
   | otherwise = mempty
 
-match :: Monoid m => [HeaderName] -> (Text -> m) -> Header -> m
+match :: [HeaderName] -> (Text -> Bool) -> Header -> Any
 match validHeaders f (Header headerName str)
-  | headerName `elem` validHeaders = f str
+  | headerName `elem` validHeaders = Any (f str)
   | otherwise = mempty
 
-for :: Monoid m => (Text -> m) -> Match m
-for = Match . match [OriginalTo, To, Cc, Bcc]
+for :: (Text -> Bool) -> Rule
+for = Rule . match [OriginalTo, To, Cc, Bcc]
 
-from :: Monoid m => (Text -> m) -> Match m
-from = Match . match [From]
+from :: (Text -> Bool) -> Rule
+from = Rule . match [From]
 
-subject :: Monoid m => (Text -> m) -> Match m
-subject = Match . match [Subject]
+subject :: (Text -> Bool) -> Rule
+subject = Rule . match [Subject]
 
-originalTo :: Monoid m => (Text -> m) -> Match m
-originalTo = Match . match [OriginalTo]
+originalTo :: (Text -> Bool) -> Rule
+originalTo = Rule . match [OriginalTo]
 
-mailingList :: Monoid m => (Text -> m) -> Match m
-mailingList = Match . match [ListID]
+mailingList :: (Text -> Bool) -> Rule
+mailingList = Rule . match [ListID]
 
-anyOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Any
-anyOf oneOf m = Any $ any (`isInfixOf` m) oneOf
+anyOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Bool
+anyOf oneOf m = any (`isInfixOf` m) oneOf
 
-allOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Any
-allOf oneOf m = Any $ all (`isInfixOf` m) oneOf
+allOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Bool
+allOf oneOf m = all (`isInfixOf` m) oneOf

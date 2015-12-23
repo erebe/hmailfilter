@@ -11,7 +11,8 @@ import           ClassyPrelude         hiding (for)
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
-import           Data.Monoid           (Any)
+import           Data.Monoid           (getAny)
+import qualified Data.Text             as T
 import qualified Data.Text.Encoding    as T
 import qualified Text.Regex.PCRE.Light as Re
 
@@ -21,10 +22,12 @@ mainUser   = "erebe"
 mainDomain = "erebe.eu"
 mainEmail  = "erebe@erebe.eu"
 
-virtualUser :: [Header] -> ByteString
-virtualUser hs =  fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)
+virtualUser :: [Header] -> Text
+virtualUser hs = T.decodeUtf8 . fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)
   where
-    isFor           = foldMap (doesMatch . for $ (\h -> if ("@" <> mainDomain) `isInfixOf` h then [h] else mempty))
+    isFor           = foldMap (\h@(Header _ str) -> if getAny (doesMatch pourDomaine h)
+                                                    then [str]
+                                                    else mempty)
     extractUser val = listToMaybe val >>= \s -> Re.match rPattern (T.encodeUtf8 s) [] >>= listToMaybe . drop 1
     capitalize user = if not . null $ user
                       then return $ (BC.singleton . C.toUpper $ BC.head user) <> BC.map C.toLower (BC.tail user)
@@ -32,59 +35,59 @@ virtualUser hs =  fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)
     rPattern        = Re.compile "([a-z._-]+)@" [Re.caseless]
 
 
-deMoi :: Match Any
+deMoi :: Rule
 deMoi = from $ anyOf ["romain.gerard@insa-lyon.fr", "erebe@erebe.eu", "romain.gerard@erebe.eu"]
 
-pourMoi :: Match Any
+pourMoi :: Rule
 pourMoi = for $ anyOf ["romain.gerard@erebe.eu", "erebe@erebe.eu"]
 
-pourDomaine :: Match Any
+pourDomaine :: Rule
 pourDomaine = for $ anyOf ["@erebe.eu"]
 
-atos :: Match Any
+atos :: Rule
 atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net"]
 
-famille :: Match Any
+famille :: Rule
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
-wyplay :: Match Any
+wyplay :: Rule
 wyplay = for $ anyOf ["wyplay@erebe.eu"]
 
-insa :: Match Any
+insa :: Rule
 insa = for $ anyOf ["@led.insa-lyon.fr", "@insa-lyon.fr", "@insalien.org", "@listes.insa-lyon.fr"]
 
-orgaIF :: Match Any
+orgaIF :: Rule
 orgaIF = subject $ anyOf ["[BdE - Equipe Orga IF]"]
 
-bde :: Match Any
+bde :: Rule
 bde = subject $ anyOf ["[ BdE -"]
 
-devNull :: Match Any
+devNull :: Rule
 devNull = for $ anyOf ["devnull@"]
 
-tabulaRasa :: Match Any
+tabulaRasa :: Rule
 tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 
-haskell :: Match Any
+haskell :: Rule
 haskell = mailingList $ anyOf ["haskell"]
 
-haskellCafe :: Match Any
+haskellCafe :: Rule
 haskellCafe = mailingList $ anyOf ["haskell-cafe" ]
 
-haskellBeg :: Match Any
+haskellBeg :: Rule
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
-blacklist :: Match Any
-blacklist =    (from $ anyOf [".Meds="])
-            <> (for $ anyOf ["mediapart@"])
+blacklist :: Rule
+blacklist =    from (anyOf [".Meds="])
+            <> for (anyOf ["mediapart@"])
 
 main :: IO ()
 main = do
     hs <- getHeaders <$> BL.getContents
 
-    let outputPath = find (not . BC.null) $ runFilter hs <$> filters
+    let outputPath = find (not . T.null) $ runFilter hs <$> filters
     let path = fromMaybe defaultMailbox outputPath
-    BC.putStrLn path
+    putStrLn path
 
     where
       defaultMailbox = ".Alpha/"
