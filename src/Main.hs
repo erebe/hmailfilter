@@ -11,7 +11,7 @@ import           ClassyPrelude         hiding (for)
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
-import           Data.Monoid           (getAny)
+import           Data.Monoid           (All, Any, getAny)
 import qualified Data.Text             as T
 import qualified Data.Text.Encoding    as T
 import qualified Text.Regex.PCRE.Light as Re
@@ -25,7 +25,7 @@ mainEmail  = "erebe@erebe.eu"
 virtualUser :: [Header] -> Text
 virtualUser hs = T.decodeUtf8 . fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)
   where
-    isFor           = foldMap (\h@(Header _ str) -> if getAny (doesMatch pourDomaine h)
+    isFor           = foldMap (\h@(Header _ str) -> if getAny (doesMatch pourDomaine [h])
                                                     then [str]
                                                     else mempty)
     extractUser val = listToMaybe val >>= \s -> Re.match rPattern (T.encodeUtf8 s) [] >>= listToMaybe . drop 1
@@ -35,49 +35,49 @@ virtualUser hs = T.decodeUtf8 . fromMaybe mainUser $ capitalize =<< extractUser 
     rPattern        = Re.compile "([a-z._-]+)@" [Re.caseless]
 
 
-deMoi :: Rule
+deMoi :: Rule Any
 deMoi = from $ anyOf ["romain.gerard@insa-lyon.fr", "erebe@erebe.eu", "romain.gerard@erebe.eu"]
 
-pourMoi :: Rule
+pourMoi :: Rule Any
 pourMoi = for $ anyOf ["romain.gerard@erebe.eu", "erebe@erebe.eu"]
 
-pourDomaine :: Rule
+pourDomaine :: Rule Any
 pourDomaine = for $ anyOf ["@erebe.eu"]
 
-atos :: Rule
+atos :: Rule Any
 atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net"]
 
-famille :: Rule
+famille :: Rule Any
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
-wyplay :: Rule
+wyplay :: Rule Any
 wyplay = for $ anyOf ["wyplay@erebe.eu"]
 
-insa :: Rule
+insa :: Rule Any
 insa = for $ anyOf ["@led.insa-lyon.fr", "@insa-lyon.fr", "@insalien.org", "@listes.insa-lyon.fr"]
 
-orgaIF :: Rule
+orgaIF :: Rule Any
 orgaIF = subject $ anyOf ["[BdE - Equipe Orga IF]"]
 
-bde :: Rule
+bde :: Rule Any
 bde = subject $ anyOf ["[ BdE -"]
 
-devNull :: Rule
+devNull :: Rule Any
 devNull = for $ anyOf ["devnull@"]
 
-tabulaRasa :: Rule
+tabulaRasa :: Rule Any
 tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 
-haskell :: Rule
+haskell :: Rule Any
 haskell = mailingList $ anyOf ["haskell"]
 
-haskellCafe :: Rule
+haskellCafe :: Rule Any
 haskellCafe = mailingList $ anyOf ["haskell-cafe" ]
 
-haskellBeg :: Rule
+haskellBeg :: Rule Any
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
-blacklist :: Rule
+blacklist :: Rule Any
 blacklist =    from (anyOf [".Meds="])
             <> for (anyOf ["mediapart@"])
 
@@ -119,5 +119,5 @@ main = do
           ,  [pourDomaine]  ->> \hs -> ".Compte." <> virtualUser hs <> "/"
 
             -- Blackhole
-          ,  mempty         ->> const defaultMailbox
+          ,  (mempty :: Rule All)  ->> const defaultMailbox
           ]

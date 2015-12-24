@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeFamilies      #-}
 
@@ -5,51 +6,70 @@
 module Filter where
 
 import           ClassyPrelude hiding (for, isInfixOf)
-import           Data.Monoid   (Any (..))
+import           Data.Monoid   (All (..), Any (..))
 import           Data.Text     hiding (all, any, find)
 import           Parser
 
 
 
-newtype Rule = Rule { doesMatch :: Header -> Any }
-instance Semigroup Rule where
+newtype Rule m = Rule { doesMatch :: [Header] -> m }
+instance Monoid m => Semigroup (Rule m) where
     (<>) = mappend
 
-instance Monoid Rule where
+instance Monoid m => Monoid (Rule m) where
     mempty = Rule $ const mempty
     mappend (Rule f) (Rule f') = Rule (\h -> f h `mappend` f' h)
 
-data Filter = Filter { rules  :: [Rule]
-                     , onRule :: [Header] -> Text
+data Filter = Filter { rules   :: Rule All
+                     , onMatch :: [Header] -> Text
                      }
 
-(->>) :: [Rule] -> ([Header] -> Text) -> Filter
-ruless ->> onRuleF = Filter ruless onRuleF
+class Mk m where
+    mk :: Bool -> m
+
+instance Mk Any where
+    mk = Any
+
+instance Mk All where
+    mk = All
+class ToFilter f where
+    (->>) :: f -> ([Header] -> Text) -> Filter
+
+instance ToFilter ([Rule Any]) where
+    ruless ->> onRuleF = Filter
+                        (Rule (\hs -> mk $ all (getAny . flip doesMatch hs) ruless))
+                        onRuleF
+
+instance ToFilter (Rule All) where
+    ruless ->> onRuleF = Filter ruless onRuleF
 
 runFilter :: [Header] -> Filter -> Text
-runFilter hs (Filter rs onRule')
-  | all (\rule -> any (getAny . doesMatch rule) hs) rs = onRule' hs
+runFilter hs (Filter rule onMatch')
+  | getAll $ doesMatch rule hs = onMatch' hs
   | otherwise = mempty
 
-match :: [HeaderName] -> (Text -> Bool) -> Header -> Any
-match validHeaders f (Header headerName str)
-  | headerName `elem` validHeaders = Any (f str)
-  | otherwise = mempty
+match :: [HeaderName] -> (Text -> Bool) -> [Header] -> Bool
+match validHeaders f =
+  getAny
+  . foldMap (\(Header headerName str) ->
+                if headerName `elem` validHeaders
+                then  Any (f str) else mempty
+            )
 
-for :: (Text -> Bool) -> Rule
-for = Rule . match [OriginalTo, To, Cc, Bcc]
+for :: Mk m => (Text -> Bool) -> Rule m
+for f = Rule $ mk . match [OriginalTo, To, Cc, Bcc] f
 
-from :: (Text -> Bool) -> Rule
-from = Rule . match [From]
+from :: Mk m => (Text -> Bool) -> Rule m
+from f = Rule $ mk . match [From] f
 
-subject :: (Text -> Bool) -> Rule
-subject = Rule . match [Subject]
+subject :: (Text -> Bool) -> Rule Any
+subject f = Rule $ mk . match [Subject] f
 
-originalTo :: (Text -> Bool) -> Rule
-originalTo = Rule . match [OriginalTo]
+originalTo :: (Text -> Bool) -> Rule Any
+originalTo f = Rule $ mk . match [OriginalTo] f
 
-mailingList :: (Text -> Bool) -> Rule
-mailingList = Rule . match [ListID]
+mailingList :: (Text -> Bool) -> Rule Any
+mailingList f = Rule $ mk . match [ListID] f
 
 anyOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Bool
 anyOf oneOf m = any (`isInfixOf` m) oneOf
