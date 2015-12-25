@@ -4,8 +4,8 @@
 
 module Main where
 
-import           Filter
 import           Parser
+import           Rule
 
 import           ClassyPrelude         hiding (for)
 import qualified Data.ByteString.Char8 as BC
@@ -35,49 +35,49 @@ virtualUser hs = T.decodeUtf8 . fromMaybe mainUser $ capitalize =<< extractUser 
     rPattern        = Re.compile "([a-z._-]+)@" [Re.caseless]
 
 
-deMoi :: Rule Any
+deMoi :: Match Any
 deMoi = from $ anyOf ["romain.gerard@insa-lyon.fr", "erebe@erebe.eu", "romain.gerard@erebe.eu"]
 
-pourMoi :: Rule Any
+pourMoi :: Match Any
 pourMoi = for $ anyOf ["romain.gerard@erebe.eu", "erebe@erebe.eu"]
 
-pourDomaine :: Rule Any
+pourDomaine :: Match Any
 pourDomaine = for $ anyOf ["@erebe.eu"]
 
-atos :: Rule Any
+atos :: Match Any
 atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net"]
 
-famille :: Rule Any
+famille :: Match Any
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
-wyplay :: Rule Any
+wyplay :: Match Any
 wyplay = for $ anyOf ["wyplay@erebe.eu"]
 
-insa :: Rule Any
+insa :: Match Any
 insa = for $ anyOf ["@led.insa-lyon.fr", "@insa-lyon.fr", "@insalien.org", "@listes.insa-lyon.fr"]
 
-orgaIF :: Rule Any
+orgaIF :: Match Any
 orgaIF = subject $ anyOf ["[BdE - Equipe Orga IF]"]
 
-bde :: Rule Any
+bde :: Match Any
 bde = subject $ anyOf ["[ BdE -"]
 
-devNull :: Rule Any
+devNull :: Match Any
 devNull = for $ anyOf ["devnull@"]
 
-tabulaRasa :: Rule Any
+tabulaRasa :: Match Any
 tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 
-haskell :: Rule Any
+haskell :: Match Any
 haskell = mailingList $ anyOf ["haskell"]
 
-haskellCafe :: Rule Any
+haskellCafe :: Match Any
 haskellCafe = mailingList $ anyOf ["haskell-cafe" ]
 
-haskellBeg :: Rule Any
+haskellBeg :: Match Any
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
-blacklist :: Rule Any
+blacklist :: Match Any
 blacklist =    from (anyOf [".Meds="])
             <> for (anyOf ["mediapart@"])
 
@@ -85,7 +85,7 @@ main :: IO ()
 main = do
     hs <- getHeaders <$> BL.getContents
 
-    let outputPath = find (not . T.null) $ runFilter hs <$> filters
+    let outputPath = find (not . T.null) $ runRule hs <$> filters
     let path = fromMaybe defaultMailbox outputPath
     putStrLn path
 
@@ -119,5 +119,5 @@ main = do
           ,  [pourDomaine]  ->> \hs -> ".Compte." <> virtualUser hs <> "/"
 
             -- Blackhole
-          ,  (mempty :: Rule All)  ->> const defaultMailbox
+          ,  (mempty :: Match All)  ->> const defaultMailbox
           ]
