@@ -45,7 +45,7 @@ pourDomaine :: Rule
 pourDomaine = for $ anyOf ["@erebe.eu"]
 
 atos :: Rule
-atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net"]
+atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net", "bull@erebe.eu"]
 
 famille :: Rule
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
@@ -79,7 +79,9 @@ haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
 blacklist :: Rule
 blacklist =    from (anyOf [".Meds="])
-            <> for (anyOf ["mediapart@"])
+            <> for  (anyOf ["mediapart@"])
+            <> from (anyOf ["datesmail.com"])
+            <> subject (anyOf ["naked photo", "pussy"])
 
 main :: IO ()
 main = do

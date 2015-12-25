@@ -23,7 +23,7 @@ library
   -- other-extensions:    
   build-depends:       base, classy-prelude,
                        bytestring, base64-bytestring, text,
-                       attoparsec, pcre-light 
+                       attoparsec, pcre-light
   default-language:    Haskell2010
 
 executable hmailfilter
