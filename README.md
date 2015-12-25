@@ -13,8 +13,18 @@ tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 haskellCafe :: Match Any
 haskellCafe = mailingList $ anyOf ["haskell-cafe"]
 
-haskellBeg :: Match Any
-haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
+-- Match if ANY of those 3 matches is a hit !
+blacklist :: Match Any
+blacklist =    from (anyOf [".Meds="])
+            <> for (anyOf ["mediapart@"])
+            <> subject (anyOf ["pussy", "naked", "fuck"])
+
+-- Match if ALL of those 2 matches is a hit !
+fromGod :: Match All
+fromGod =      from (anyOf ["God"])
+            <> subject (anyOf ["It's God talking"])
+
+
 ```
 Rule examples
 ```haskell
