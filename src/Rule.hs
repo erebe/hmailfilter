@@ -20,9 +20,9 @@ instance Monoid m => Monoid (Match m) where
     mempty = Match $ const mempty
     mappend (Match f) (Match f') = Match (\h -> f h `mappend` f' h)
 
-data Rule = Rule { rules       :: Match All
-                     , onMatch :: [Header] -> Text
-                     }
+data Rule = Rule { rules   :: Match All
+                 , onMatch :: [Header] -> Text
+                 }
 
 class Mk m where
     mk :: Bool -> m
@@ -32,6 +32,7 @@ instance Mk Any where
 
 instance Mk All where
     mk = All
+
 class ToRule f where
     (->>) :: f -> ([Header] -> Text) -> Rule
 
@@ -43,9 +44,9 @@ instance ToRule ([Match Any]) where
 instance ToRule (Match All) where
     ruless ->> onMatchF = Rule ruless onMatchF
 
-runRule :: [Header] -> Rule -> Text
+runRule :: [Header] -> Rule -> Maybe Text
 runRule hs (Rule rule onMatch')
-  | getAll $ doesMatch rule hs = onMatch' hs
+  | getAll $ doesMatch rule hs = Just $ onMatch' hs
   | otherwise = mempty
 
 match :: [HeaderName] -> (Text -> Bool) -> [Header] -> Bool

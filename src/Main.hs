@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -12,7 +11,6 @@ import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
 import           Data.Monoid           (All, Any, getAny)
-import qualified Data.Text             as T
 import qualified Data.Text.Encoding    as T
 import qualified Text.Regex.PCRE.Light as Re
 
@@ -85,39 +83,39 @@ main :: IO ()
 main = do
     hs <- getHeaders <$> BL.getContents
 
-    let outputPath = find (not . T.null) $ runRule hs <$> filters
+    let outputPath = join . find isJust $ runRule hs <$> myRules
     let path = fromMaybe defaultMailbox outputPath
     putStrLn path
 
     where
       defaultMailbox = ".Alpha/"
-      filters = [
-            -- Blacklist
-             [blacklist]    ->> const "/dev/null"
+      myRules = [
+           -- Blacklist
+            [blacklist]    ->> const "/dev/null"
 
-            -- Perso
-          ,  [deMoi]        ->> const ".Moi/"
-          ,  [famille]      ->> const ".Famille/"
+           -- Perso
+          , [deMoi]        ->> const ".Moi/"
+          , [famille]      ->> const ".Famille/"
 
-            -- Mailing List
-          ,  [haskellCafe]  ->> const ".Mailing.Haskell-Cafe/"
-          ,  [haskellBeg]   ->> const ".Mailing.Haskell-Beginner/"
+           -- Mailing List
+          , [haskellCafe]  ->> const ".Mailing.Haskell-Cafe/"
+          , [haskellBeg]   ->> const ".Mailing.Haskell-Beginner/"
 
-            -- Professionnel
-          ,  [atos]         ->> const ".Professionnel.Bull/"
-          ,  [wyplay]       ->> const ".Professionnel.Wyplay/"
+           -- Professionnel
+          , [atos]         ->> const ".Professionnel.Bull/"
+          , [wyplay]       ->> const ".Professionnel.Wyplay/"
 
-            -- Scolarité
-          ,  [insa, orgaIF] ->> const ".Scolarite.INSA.BdE.OrgaIF/"
-          ,  [insa, bde]    ->> const ".Scolarite.INSA.BdE/"
-          ,  [insa]         ->> const ".Scolarite.INSA/"
+           -- Scolarité
+          , [insa, orgaIF] ->> const ".Scolarite.INSA.BdE.OrgaIF/"
+          , [insa, bde]    ->> const ".Scolarite.INSA.BdE/"
+          , [insa]         ->> const ".Scolarite.INSA/"
 
-            -- ToMe
-          ,  [pourMoi]      ->> const defaultMailbox
-          ,  [devNull]      ->> const "/dev/null"
-          ,  [tabulaRasa]   ->> const ".Compte.TabulaRasa/"
-          ,  [pourDomaine]  ->> \hs -> ".Compte." <> virtualUser hs <> "/"
+           -- ToMe
+          , [pourMoi]      ->> const defaultMailbox
+          , [devNull]      ->> const "/dev/null"
+          , [tabulaRasa]   ->> const ".Compte.TabulaRasa/"
+          , [pourDomaine]  ->> \hs -> ".Compte." <> virtualUser hs <> "/"
 
-            -- Blackhole
-          ,  (mempty :: Match All)  ->> const defaultMailbox
+           -- Blackhole, not necessary as there is a Maybe
+          , (mempty :: Match All)  ->> const defaultMailbox
           ]
