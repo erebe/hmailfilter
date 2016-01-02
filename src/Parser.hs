@@ -1,5 +1,7 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
 module Parser where
 
@@ -28,7 +30,7 @@ data HeaderName = ReturnPath
                 | Bcc
                 | ListID
                 | Unknown Text
-                deriving (Show, Read, Eq)
+                deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 data Header = Header HeaderName Text deriving (Show, Read)
 
@@ -123,4 +125,4 @@ parseHeaders = do
         return ()
 
 getHeaders :: LByteString -> [Header]
-getHeaders str = fromMaybe [] (PL.maybeResult $ PL.parse parseHeaders str)
+getHeaders = (fromMaybe []) . PL.maybeResult . PL.parse parseHeaders

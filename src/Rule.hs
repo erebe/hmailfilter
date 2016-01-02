@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeFamilies      #-}
@@ -5,10 +6,9 @@
 
 module Rule where
 
-import           ClassyPrelude hiding (for, isInfixOf)
+import           ClassyPrelude hiding (for)
 import           Data.Monoid   (All (..), Any (..))
-import           Data.Text     hiding (all, any, find)
-import           Parser
+import           Parser        (Header (..), HeaderName (..))
 
 
 
@@ -51,11 +51,12 @@ runRule hs (Rule rule onMatch')
 
 match :: [HeaderName] -> (Text -> Bool) -> [Header] -> Bool
 match validHeaders f =
-  getAny
-  . foldMap (\(Header headerName str) ->
-                if headerName `elem` validHeaders
-                then  Any (f str) else mempty
-            )
+  let applyOn = setFromList validHeaders :: HashSet HeaderName
+  in getAny . foldMap (\(Header headerName str) ->
+                         if headerName `member` applyOn
+                         then  Any (f str)
+                         else mempty
+                      )
 
 for :: Mk m => (Text -> Bool) -> Match m
 for f = Match $ mk . match [OriginalTo, To, Cc, Bcc] f
@@ -72,8 +73,8 @@ originalTo f = Match $ mk . match [OriginalTo] f
 mailingList :: (Text -> Bool) -> Match Any
 mailingList f = Match $ mk . match [ListID] f
 
-anyOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Bool
+anyOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
 anyOf oneOf m = any (`isInfixOf` m) oneOf
 
-allOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Bool
+allOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
 allOf oneOf m = all (`isInfixOf` m) oneOf
