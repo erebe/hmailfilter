@@ -57,7 +57,7 @@ parseHeaderName :: Parser HeaderName
 parseHeaderName = do
     val <- BC.map C.toLower <$> PC.takeWhile (PC.notInClass "\r\n:")
     _ <- char ':'
-    return $ lookupDefault (Unknown (T.decodeUtf8With T.ignore val)) val headerMapping
+    return $! lookupDefault (Unknown (T.decodeUtf8With T.ignore val)) val headerMapping
 
 {-# INLINE parseHeaderName #-}
 
@@ -72,7 +72,7 @@ parseQEncodedWord = do
 
     if BC.null value
     then mempty
-    else return value
+    else return $! value
 
 
 
@@ -80,7 +80,7 @@ prettyFormatHeaderContent :: ByteString -> Text
 prettyFormatHeaderContent str = fromMaybe (T.decodeUtf8 str) $ do
     [_,h, charset, encoding, payload, t] <- Re.match rx str []
 
-    return $ T.decodeUtf8 h
+    return $! T.decodeUtf8 h
            <> (decodeCharset charset . decodeEncoding encoding $ payload)
            <> prettyFormatHeaderContent t
 
@@ -109,37 +109,34 @@ parseHeaderContent = do
         next <- P.peekWord8
         if fromMaybe False (isHorizontalSpace <$> next)
         then (\nextVal -> value <> " " <> nextVal) <$> parseHeaderContent
-        else return value
+        else return $! value
 
 {-# INLINE parseHeaderContent #-}
 
-parseHeader :: Parser Header
-parseHeader = do
+parseHeader :: HashMap HeaderName [Header] -> Parser (HashMap HeaderName [Header])
+parseHeader acc = do
     header <- parseHeaderName
     value <- prettyFormatHeaderContent <$> parseHeaderContent
-    return $ Header header value
+    return $! insertWith (<>) header [Header header value] acc
 
 {-# INLINE parseHeader #-}
 
-parseHeaders :: Parser (HashMap HeaderName [Header])
-parseHeaders = do
-    headers <- toHashMap <$> many' parseHeader
+manyM :: (a -> Parser a)  -> a -> Parser a
+manyM parser acc = parser acc >>= \acc' -> manyM parser acc' <|> return acc'
+
+parseHeaders :: HashMap HeaderName [Header] -> Parser (HashMap HeaderName [Header])
+parseHeaders acc = do 
+    headers <- manyM parseHeader acc
     next <- P.peekWord8
     if fromMaybe True (isEndOfLine <$> next)
     then return headers
-    else do
-       skipUnknownStuff
-       newHeaders <- parseHeaders
-       return $ unionWith (<>) headers newHeaders
+    else skipUnknownStuff >> parseHeaders headers
 
   where
     skipUnknownStuff = do
         P.skipWhile (not . isEndOfLine)
         P.skipWhile isEndOfLine
-        return ()
-
-toHashMap :: [Header] -> HashMap HeaderName [Header]
-toHashMap headers = fromListWith (<>) [(nam, [h]) | h@(Header nam _) <- headers]
+        return $! ()
 
 getHeaders :: LByteString -> HashMap HeaderName [Header]
-getHeaders = (fromMaybe mempty) . PL.maybeResult . PL.parse parseHeaders
+getHeaders = (fromMaybe mempty) . PL.maybeResult . PL.parse (parseHeaders mempty)

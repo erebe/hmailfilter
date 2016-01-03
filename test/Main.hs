@@ -43,16 +43,16 @@ genHeader = do
 
 prop_HeaderParser :: Property
 prop_HeaderParser = forAll genHeader $ \h ->
-  either (const False) (const True) (parseOnly parseHeader h)
+  either (const False) (const True) (parseOnly (parseHeader mempty) h)
 
 genHeaders :: Gen ByteString
 genHeaders = do
-    hs <- ofoldMap id <$> listOf genHeader
+    hs <- ofoldMap id <$> listOf1 genHeader
     return $ hs <> "\r\n"
 
 prop_HeadersParser :: Property
 prop_HeadersParser = forAll genHeaders $ \h ->
-  either (const False) (const True) (parseOnly parseHeaders h)
+  either (const False) (const True) (parseOnly (parseHeaders mempty) h )
 
 prop_realHeader :: Property
 prop_realHeader = forAll (elements exHeaders) $ \h ->
