@@ -6,13 +6,13 @@
 
 module Rule where
 
-import           ClassyPrelude hiding (for)
-import           Data.Monoid   (All (..), Any (..))
-import           Parser        (Header (..), HeaderName (..))
+import           ClassyPrelude       hiding (for, toList)
+import           Data.HashMap.Strict
+import           Data.Monoid         (All (..), Any (..))
+import           Parser              (Header (..), HeaderName (..))
 
 
-
-newtype Match m = Match { doesMatch :: [Header] -> m }
+newtype Match m = Match { doesMatch :: HashMap HeaderName [Header] -> m }
 instance Monoid m => Semigroup (Match m) where
     (<>) = mappend
 
@@ -44,19 +44,17 @@ instance ToRule ([Match Any]) where
 instance ToRule (Match All) where
     ruless ->> onMatchF = Rule ruless onMatchF
 
-runRule :: [Header] -> Rule -> Maybe Text
+runRule :: HashMap HeaderName [Header] -> Rule -> Maybe Text
 runRule hs (Rule rule onMatch')
-  | getAll $ doesMatch rule hs = Just $ onMatch' hs
+  | getAll $ doesMatch rule hs = Just $ onMatch' $ mconcat $ snd <$> toList hs
   | otherwise = mempty
 
-match :: [HeaderName] -> (Text -> Bool) -> [Header] -> Bool
-match validHeaders f =
-  let applyOn = setFromList validHeaders :: HashSet HeaderName
-  in getAny . foldMap (\(Header headerName str) ->
-                         if headerName `member` applyOn
-                         then  Any (f str)
-                         else mempty
-                      )
+match :: [HeaderName] -> (Text -> Bool) -> HashMap HeaderName [Header] -> Bool
+match validHeaders f headers =
+  getAny $ foldMap (\headerName ->
+                      let headers' = lookupDefault mempty headerName headers in
+                      ofoldMap (Any . f . content) headers'
+                    ) validHeaders
 
 for :: Mk m => (Text -> Bool) -> Match m
 for f = Match $ mk . match [OriginalTo, To, Cc, Bcc] f

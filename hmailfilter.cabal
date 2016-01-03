@@ -21,9 +21,14 @@ library
   ghc-options:         -Wall -O3 
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base, classy-prelude,
-                       bytestring, base64-bytestring, text,
-                       attoparsec, pcre-light 
+  build-depends:       attoparsec
+                     , base
+                     , base64-bytestring
+                     , bytestring
+                     , classy-prelude
+                     , pcre-light
+                     , text
+                     , unordered-containers >= 0.2.5.1
   default-language:    Haskell2010
 
 executable hmailfilter
@@ -31,9 +36,14 @@ executable hmailfilter
   ghc-options:         -Wall -O3 
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base, classy-prelude,
-                       bytestring, base64-bytestring, text,
-                       attoparsec, pcre-light
+  build-depends:       attoparsec
+                     , base
+                     , base64-bytestring
+                     , bytestring
+                     , classy-prelude
+                     , pcre-light
+                     , text
+                     , unordered-containers >= 0.2.5.1
   hs-source-dirs:      src
   default-language:    Haskell2010
 
@@ -43,6 +53,12 @@ test-suite tests
   hs-source-dirs:  test
   Main-Is:         Main.hs
   Type:            exitcode-stdio-1.0
-  Build-Depends:   hmailfilter, QuickCheck, base, classy-prelude, attoparsec, bytestring
+  Build-Depends:   QuickCheck
+                 , attoparsec
+                 , base
+                 , bytestring
+                 , classy-prelude
+                 , hmailfilter
+                 , unordered-containers >= 0.2.5.1
   Ghc-Options:     -Wall -threaded -O3 -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010

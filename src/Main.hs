@@ -6,10 +6,11 @@ module Main where
 import           Parser
 import           Rule
 
-import           ClassyPrelude         hiding (for)
+import           ClassyPrelude         hiding (for, singleton)
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
+import           Data.HashMap.Strict   (singleton)
 import           Data.Monoid           (All, Any, getAny)
 import qualified Data.Text.Encoding    as T
 import qualified Text.Regex.PCRE.Light as Re
@@ -23,7 +24,7 @@ mainEmail  = "erebe@erebe.eu"
 virtualUser :: [Header] -> Text
 virtualUser hs = T.decodeUtf8 . fromMaybe mainUser $ capitalize =<< extractUser (isFor hs)
   where
-    isFor           = foldMap (\h@(Header _ str) -> if getAny (doesMatch pourDomaine [h])
+    isFor           = foldMap (\h@(Header hName str) -> if getAny (doesMatch pourDomaine (singleton hName [h]))
                                                     then [str]
                                                     else mempty)
     extractUser val = listToMaybe val >>= \s -> Re.match rPattern (T.encodeUtf8 s) [] >>= listToMaybe . drop 1
@@ -81,9 +82,9 @@ blacklist =    from (anyOf [".Meds="])
 
 main :: IO ()
 main = do
-    hs <- getHeaders <$> BL.getContents
+    headers <- getHeaders <$> BL.getContents
 
-    let outputPath = join . find isJust $ runRule hs <$> myRules
+    let outputPath = join . find isJust $ runRule headers <$> myRules
     let path = fromMaybe defaultMailbox outputPath
     putStrLn path
 
