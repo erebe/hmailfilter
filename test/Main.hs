@@ -59,10 +59,11 @@ prop_realHeader = forAll (elements exHeaders) $ \h ->
   check (getHeaders h)
   where
     check hs = (\(hs',uns) -> length hs' == 5 && length uns == 6 ) $
-               flip partition hs $ \h ->
-                                    case h of
-                                    Header (Unknown _) _ -> False
-                                    _ -> True
+               partition (\h ->
+                         case h of
+                         Header (Unknown _) _ -> False
+                         _ -> True)
+               $ foldl' (<>) [] hs
 
 
 return []

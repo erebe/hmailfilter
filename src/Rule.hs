@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeFamilies      #-}
@@ -5,14 +6,13 @@
 
 module Rule where
 
-import           ClassyPrelude hiding (for, isInfixOf)
-import           Data.Monoid   (All (..), Any (..))
-import           Data.Text     hiding (all, any, find)
-import           Parser
+import           ClassyPrelude       hiding (for, toList)
+import           Data.HashMap.Strict
+import           Data.Monoid         (All (..), Any (..))
+import           Parser              (Header (..), HeaderName (..))
 
 
-
-newtype Match m = Match { doesMatch :: [Header] -> m }
+newtype Match m = Match { doesMatch :: HashMap HeaderName [Header] -> m }
 instance Monoid m => Semigroup (Match m) where
     (<>) = mappend
 
@@ -44,18 +44,17 @@ instance ToRule ([Match Any]) where
 instance ToRule (Match All) where
     ruless ->> onMatchF = Rule ruless onMatchF
 
-runRule :: [Header] -> Rule -> Maybe Text
+runRule :: HashMap HeaderName [Header] -> Rule -> Maybe Text
 runRule hs (Rule rule onMatch')
-  | getAll $ doesMatch rule hs = Just $ onMatch' hs
+  | getAll $ doesMatch rule hs = Just $ onMatch' $ mconcat $ snd <$> toList hs
   | otherwise = mempty
 
-match :: [HeaderName] -> (Text -> Bool) -> [Header] -> Bool
-match validHeaders f =
-  getAny
-  . foldMap (\(Header headerName str) ->
-                if headerName `elem` validHeaders
-                then  Any (f str) else mempty
-            )
+match :: [HeaderName] -> (Text -> Bool) -> HashMap HeaderName [Header] -> Bool
+match validHeaders f headers =
+  getAny $ foldMap (\headerName ->
+                      let headers' = lookupDefault mempty headerName headers in
+                      ofoldMap (Any . f . content) headers'
+                    ) validHeaders
 
 for :: Mk m => (Text -> Bool) -> Match m
 for f = Match $ mk . match [OriginalTo, To, Cc, Bcc] f
@@ -72,8 +71,8 @@ originalTo f = Match $ mk . match [OriginalTo] f
 mailingList :: (Text -> Bool) -> Match Any
 mailingList f = Match $ mk . match [ListID] f
 
-anyOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Bool
+anyOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
 anyOf oneOf m = any (`isInfixOf` m) oneOf
 
-allOf :: (MonoTraversable t, Element t ~ Text) => t -> Text -> Bool
+allOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
 allOf oneOf m = all (`isInfixOf` m) oneOf

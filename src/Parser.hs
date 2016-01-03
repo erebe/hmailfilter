@@ -1,15 +1,19 @@
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Parser where
 
-import           ClassyPrelude                    hiding (foldMap)
+import           ClassyPrelude                    hiding (foldMap, fromList)
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
 import           Data.Attoparsec.ByteString.Lazy  as PL
 import           Data.ByteString.Base64           as B64 hiding (decode)
 import qualified Data.ByteString.Char8            as BC
 import qualified Data.Char                        as C
+import           Data.HashMap.Strict              (fromList, fromListWith,
+                                                   lookupDefault)
 import qualified Data.Text.Encoding               as T
 import qualified Data.Text.Encoding.Error         as T
 import qualified Text.Regex.PCRE.Light            as Re
@@ -28,28 +32,33 @@ data HeaderName = ReturnPath
                 | Bcc
                 | ListID
                 | Unknown Text
-                deriving (Show, Read, Eq)
+                deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
-data Header = Header HeaderName Text deriving (Show, Read)
+data Header = Header { name :: HeaderName, content :: Text } deriving (Show, Read)
+
+headerMapping :: HashMap ByteString HeaderName
+headerMapping = fromList $ [
+    ("return-path"   , ReturnPath),
+    ("x-original-to" , OriginalTo),
+    ("delivered-to"  , DeliveredTo),
+    ("received"      , Received),
+    ("content-type"  , ContentType),
+    ("thread-topic"  , ThreadTopic),
+    ("date"          , Date),
+    ("subject"       , Subject),
+    ("from"          , From),
+    ("to"            , To),
+    ("cc"            , Cc),
+    ("bcc"           , Bcc),
+    ("list-id"       , ListID)
+    ]
 
 parseHeaderName :: Parser HeaderName
-parseHeaderName =     (stringCI "Return-Path:"   >> return ReturnPath)
-                  <|> (stringCI "X-Original-To:" >> return OriginalTo)
-                  <|> (stringCI "Delivered-To:"  >> return DeliveredTo)
-                  <|> (stringCI "Received:"      >> return Received)
-                  <|> (stringCI "Content-Type:"  >> return ContentType)
-                  <|> (stringCI "Thread-Topic:"  >> return ThreadTopic)
-                  <|> (stringCI "Date:"          >> return Date)
-                  <|> (stringCI "Subject:"       >> return Subject)
-                  <|> (stringCI "From:"          >> return From)
-                  <|> (stringCI "To:"            >> return To)
-                  <|> (stringCI "Cc:"            >> return Cc)
-                  <|> (stringCI "Bcc:"           >> return Bcc)
-                  <|> (stringCI "List-Id:"       >> return ListID)
-                  <|> do
-                        val <- PC.takeWhile (`onotElem` asString "\r\n:")
-                        _ <- char ':'
-                        return $ Unknown (T.decodeUtf8With T.ignore val)
+parseHeaderName = do
+    val <- BC.map C.toLower <$> PC.takeWhile (PC.notInClass "\r\n:")
+    _ <- char ':'
+    return $ lookupDefault (Unknown (T.decodeUtf8With T.ignore val)) val headerMapping
+
 
 parseQEncodedWord :: Parser ByteString
 parseQEncodedWord = do
@@ -92,8 +101,9 @@ parseHeaderValue str = fromMaybe (T.decodeUtf8 str) $ do
 parseHeader :: Parser Header
 parseHeader = do
     header <- parseHeaderName
-    value <- takeValue
-    return $ Header header (parseHeaderValue value)
+    value <- parseHeaderValue <$> takeValue
+
+    return $ Header header value
 
     where
       takeValue = do
@@ -102,25 +112,26 @@ parseHeader = do
         _ <- endOfLine
         next <- P.peekWord8
         if fromMaybe False (isHorizontalSpace <$> next)
-        then takeValue >>= \after -> return $ value <> " " <> after
+        then (\nextVal -> value <> " " <> nextVal) <$> takeValue
         else return value
 
-parseHeaders :: Parser [Header]
+parseHeaders :: Parser (HashMap HeaderName [Header])
 parseHeaders = do
-    headers <- many' parseHeader
+    headers <- toHashMap <$> many' parseHeader
     next <- P.peekWord8
     if fromMaybe True (isEndOfLine <$> next)
     then return headers
     else do
        skipUnknownStuff
        newHeaders <- parseHeaders
-       return $ headers <> newHeaders
+       return $ unionWith (<>) headers newHeaders
 
   where
+    toHashMap headers = fromListWith (<>) [(nam, [h]) | h@(Header nam _) <- headers]
     skipUnknownStuff = do
         P.skipWhile (not . isEndOfLine)
         P.skipWhile isEndOfLine
         return ()
 
-getHeaders :: LByteString -> [Header]
-getHeaders str = fromMaybe [] (PL.maybeResult $ PL.parse parseHeaders str)
+getHeaders :: LByteString -> HashMap HeaderName [Header]
+getHeaders = (fromMaybe mempty) . PL.maybeResult . PL.parse parseHeaders
