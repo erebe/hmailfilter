@@ -56,6 +56,6 @@ $DEST
 1. Edit your procmailrc and use procmail to run the mail filter
 
 ## Todo 
-1. Replace header list with a hashMap (Maybe)
+1. Add some reader Monad instead of Hashmap -> Parser HashMap
 
 
