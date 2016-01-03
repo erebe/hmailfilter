@@ -51,11 +51,12 @@ runRule hs (Rule rule onMatch')
 
 match :: [HeaderName] -> (Text -> Bool) -> HashMap HeaderName [Header] -> Bool
 match validHeaders f headers =
-  getAny $ foldMap (\headerName ->
+  getAny $ ofoldMap (\headerName ->
                       let headers' = lookupDefault mempty headerName headers in
                       ofoldMap (Any . f . content) headers'
                     ) validHeaders
-
+{-# INLINE match #-}
+  
 for :: Mk m => (Text -> Bool) -> Match m
 for f = Match $ mk . match [OriginalTo, To, Cc, Bcc] f
 
@@ -73,6 +74,8 @@ mailingList f = Match $ mk . match [ListID] f
 
 anyOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
 anyOf oneOf m = any (`isInfixOf` m) oneOf
+{-# INLINE anyOf #-}
 
 allOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
 allOf oneOf m = all (`isInfixOf` m) oneOf
+{-# INLINE allOf #-}

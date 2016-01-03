@@ -59,6 +59,7 @@ parseHeaderName = do
     _ <- char ':'
     return $ lookupDefault (Unknown (T.decodeUtf8With T.ignore val)) val headerMapping
 
+{-# INLINE parseHeaderName #-}
 
 parseQEncodedWord :: Parser ByteString
 parseQEncodedWord = do
@@ -75,13 +76,13 @@ parseQEncodedWord = do
 
 
 
-parseHeaderValue :: ByteString -> Text
-parseHeaderValue str = fromMaybe (T.decodeUtf8 str) $ do
+prettyFormatHeaderContent :: ByteString -> Text
+prettyFormatHeaderContent str = fromMaybe (T.decodeUtf8 str) $ do
     [_,h, charset, encoding, payload, t] <- Re.match rx str []
 
     return $ T.decodeUtf8 h
            <> (decodeCharset charset . decodeEncoding encoding $ payload)
-           <> parseHeaderValue t
+           <> prettyFormatHeaderContent t
 
     where
       decodeEncoding en = if BC.map C.toUpper en == "B"
@@ -97,23 +98,28 @@ parseHeaderValue str = fromMaybe (T.decodeUtf8 str) $ do
       rx = flip Re.compile [Re.caseless] $ "^(.*?)=\\?"
                                         <> "([^\\?]+)\\?([QB])\\?(.*?)\\?="
                                         <> "(.*)$"
+{-# INLINE prettyFormatHeaderContent #-}
 
-parseHeader :: Parser Header
-parseHeader = do
-    header <- parseHeaderName
-    value <- parseHeaderValue <$> takeValue
 
-    return $ Header header value
-
-    where
-      takeValue = do
+parseHeaderContent :: Parser ByteString
+parseHeaderContent = do
         P.skipWhile isHorizontalSpace
         value <- P.takeTill isEndOfLine
         _ <- endOfLine
         next <- P.peekWord8
         if fromMaybe False (isHorizontalSpace <$> next)
-        then (\nextVal -> value <> " " <> nextVal) <$> takeValue
+        then (\nextVal -> value <> " " <> nextVal) <$> parseHeaderContent
         else return value
+
+{-# INLINE parseHeaderContent #-}
+
+parseHeader :: Parser Header
+parseHeader = do
+    header <- parseHeaderName
+    value <- prettyFormatHeaderContent <$> parseHeaderContent
+    return $ Header header value
+
+{-# INLINE parseHeader #-}
 
 parseHeaders :: Parser (HashMap HeaderName [Header])
 parseHeaders = do
@@ -127,11 +133,13 @@ parseHeaders = do
        return $ unionWith (<>) headers newHeaders
 
   where
-    toHashMap headers = fromListWith (<>) [(nam, [h]) | h@(Header nam _) <- headers]
     skipUnknownStuff = do
         P.skipWhile (not . isEndOfLine)
         P.skipWhile isEndOfLine
         return ()
+
+toHashMap :: [Header] -> HashMap HeaderName [Header]
+toHashMap headers = fromListWith (<>) [(nam, [h]) | h@(Header nam _) <- headers]
 
 getHeaders :: LByteString -> HashMap HeaderName [Header]
 getHeaders = (fromMaybe mempty) . PL.maybeResult . PL.parse parseHeaders
