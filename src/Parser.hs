@@ -12,8 +12,7 @@ import           Data.Attoparsec.ByteString.Lazy  as PL
 import           Data.ByteString.Base64           as B64 hiding (decode)
 import qualified Data.ByteString.Char8            as BC
 import qualified Data.Char                        as C
-import           Data.HashMap.Strict              (fromList, fromListWith,
-                                                   lookupDefault)
+import           Data.HashMap.Strict              (fromList, lookupDefault)
 import qualified Data.Text.Encoding               as T
 import qualified Data.Text.Encoding.Error         as T
 import qualified Text.Regex.PCRE.Light            as Re
@@ -125,7 +124,7 @@ manyM :: (a -> Parser a)  -> a -> Parser a
 manyM parser acc = parser acc >>= \acc' -> manyM parser acc' <|> return acc'
 
 parseHeaders :: HashMap HeaderName [Header] -> Parser (HashMap HeaderName [Header])
-parseHeaders acc = do 
+parseHeaders acc = do
     headers <- manyM parseHeader acc
     next <- P.peekWord8
     if fromMaybe True (isEndOfLine <$> next)
