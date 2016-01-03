@@ -7,6 +7,7 @@ import           Parser
 import           Rule
 
 import           ClassyPrelude         hiding (for, singleton)
+import           Control.Monad         (msum)
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
@@ -86,7 +87,7 @@ main :: IO ()
 main = do
     headers <- getHeaders <$> BL.getContents
 
-    let outputPath = join . find isJust $ runRule headers <$> myRules
+    let outputPath = msum $ runRule headers <$> myRules
     let path = fromMaybe defaultMailbox outputPath
     putStrLn path
 
