@@ -13,8 +13,18 @@ tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 haskellCafe :: Match Any
 haskellCafe = mailingList $ anyOf ["haskell-cafe"]
 
-haskellBeg :: Match Any
-haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
+-- Match if ANY of those 3 matches is a hit !
+blacklist :: Match Any
+blacklist =    from (anyOf [".Meds="])
+            <> for (anyOf ["mediapart@"])
+            <> subject (anyOf ["pussy", "naked", "fuck"])
+
+-- Match if ALL of those 2 matches is a hit !
+fromGod :: Match All
+fromGod =      from (anyOf ["God"])
+            <> subject (anyOf ["It's God talking"])
+
+
 ```
 Rule examples
 ```haskell
@@ -39,10 +49,8 @@ $DEST
 
 ## How to run ? 
 ##### To install (only once):
-1. cabal sandbox init
-2. Edit your rules in src/Main.hs
-3. cabal install -j
-4. sudo cp .cabal-sandbox/bin/hmailfilter /usr/local/bin
+1. stack init
+2. stack install
 
 ##### Now to run: 
 1. Edit your procmailrc and use procmail to run the mail filter
