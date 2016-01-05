@@ -1,9 +1,16 @@
+{-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser where
+module Parser (
+    getHeaders
+    , Header(..)
+    , HeaderName(..)
+    ) where
+
+
 
 import           ClassyPrelude                    hiding (foldMap, fromList)
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
@@ -30,26 +37,29 @@ data HeaderName = ReturnPath
                 | Cc
                 | Bcc
                 | ListID
-                | Unknown Text
+                | Unknown !Text
                 deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
-data Header = Header { name :: HeaderName, content :: Text } deriving (Show, Read)
+data Header = Header {
+      name    :: !HeaderName
+    , content :: !Text
+    } deriving (Show, Read)
 
 headerMapping :: HashMap ByteString HeaderName
-headerMapping = fromList $ [
-    ("return-path"   , ReturnPath),
-    ("x-original-to" , OriginalTo),
-    ("delivered-to"  , DeliveredTo),
-    ("received"      , Received),
-    ("content-type"  , ContentType),
-    ("thread-topic"  , ThreadTopic),
-    ("date"          , Date),
-    ("subject"       , Subject),
-    ("from"          , From),
-    ("to"            , To),
-    ("cc"            , Cc),
-    ("bcc"           , Bcc),
-    ("list-id"       , ListID)
+headerMapping = fromList [
+      ("return-path"   , ReturnPath)
+    , ("x-original-to" , OriginalTo)
+    , ("delivered-to"  , DeliveredTo)
+    , ("received"      , Received)
+    , ("content-type"  , ContentType)
+    , ("thread-topic"  , ThreadTopic)
+    , ("date"          , Date)
+    , ("subject"       , Subject)
+    , ("from"          , From)
+    , ("to"            , To)
+    , ("cc"            , Cc)
+    , ("bcc"           , Bcc)
+    , ("list-id"       , ListID)
     ]
 
 parseHeaderName :: Parser HeaderName
@@ -60,18 +70,28 @@ parseHeaderName = do
 
 {-# INLINE parseHeaderName #-}
 
+
 parseQEncodedWord :: Parser ByteString
 parseQEncodedWord = do
-    value <-     (char '_' >> return " ")
-             <|> (char '=' >> do
-               hex <- P.take 2
-               let ret = parseOnly hexadecimal hex
-               return $ either (const hex) singleton ret)
-             <|> PC.takeTill (PC.inClass "=_")
+    ch <- PC.peekChar'
+    case ch of
+      '_' -> P.take 1 >> return " "
+      '=' -> P.take 1 >> parseHexadecimal
+      _   -> consumeRegularInput
 
-    if BC.null value
-    then mempty
-    else return $! value
+    where
+      consumeRegularInput = do
+          val <- PC.takeWhile (PC.inClass "=_")
+          if BC.null val
+            then mempty
+            else return val
+
+      parseHexadecimal = do
+          hex <- P.take 2
+          let ret = parseOnly hexadecimal hex
+          return $! either (const hex) singleton ret
+
+{-# INLINE parseQEncodedWord #-}
 
 
 
@@ -100,6 +120,7 @@ prettyFormatHeaderContent str = fromMaybe (T.decodeUtf8 str) $ do
 {-# INLINE prettyFormatHeaderContent #-}
 
 
+
 parseHeaderContent :: Parser ByteString
 parseHeaderContent = do
         P.skipWhile isHorizontalSpace
@@ -112,16 +133,27 @@ parseHeaderContent = do
 
 {-# INLINE parseHeaderContent #-}
 
+
+
 parseHeader :: HashMap HeaderName [Header] -> Parser (HashMap HeaderName [Header])
 parseHeader acc = do
-    header <- parseHeaderName
-    value <- prettyFormatHeaderContent <$> parseHeaderContent
-    return $! insertWith (<>) header [Header header value] acc
+    hname <- parseHeaderName
+    hcontent <- parseHeaderContent
+
+    -- Force evaluation of hcontent in order to be able to be
+    -- lazy for the prettyFormat without penality (Header will not be evaluated)
+    let !hcontent' = hcontent
+    return $! insertWith (<>) hname [Header hname (prettyFormatHeaderContent hcontent')] acc
 
 {-# INLINE parseHeader #-}
 
-manyM :: (a -> Parser a)  -> a -> Parser a
+
+
+manyM :: (a -> Parser a) -> a -> Parser a
 manyM parser acc = parser acc >>= \acc' -> manyM parser acc' <|> return acc'
+{-# INLINE manyM #-}
+
+
 
 parseHeaders :: HashMap HeaderName [Header] -> Parser (HashMap HeaderName [Header])
 parseHeaders acc = do
@@ -135,7 +167,7 @@ parseHeaders acc = do
     skipUnknownStuff = do
         P.skipWhile (not . isEndOfLine)
         P.skipWhile isEndOfLine
-        return $! ()
+
 
 getHeaders :: LByteString -> HashMap HeaderName [Header]
-getHeaders = (fromMaybe mempty) . PL.maybeResult . PL.parse (parseHeaders mempty)
+getHeaders = fromMaybe mempty . PL.maybeResult . PL.parse (parseHeaders mempty)
