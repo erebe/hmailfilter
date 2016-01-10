@@ -6,6 +6,8 @@
 
 module Parser (
     getHeaders
+    , parseHeader
+    , parseHeaders
     , Header(..)
     , HeaderName(..)
     ) where

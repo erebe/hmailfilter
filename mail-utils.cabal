@@ -1,0 +1,75 @@
+name:                mail-utils
+version:             0.1.0.0
+synopsis:            Classifier, Filter, Parser for emails
+description:         Please see README.md
+homepage:            http://github.com/githubuser/mail-utils#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Romain Gérard
+maintainer:          romain.gerard@erebe.eu
+copyright:           2010 Author Romain Gérard
+category:            Mail 
+build-type:          Simple
+-- extra-source-files:
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Parser, Rule
+  build-depends:       base >= 4.7 && < 5
+                     , attoparsec
+                     , base64-bytestring
+                     , bytestring
+                     , classy-prelude
+                     , pcre-light
+                     , text
+                     , unordered-containers >= 0.2.5.1
+  default-language:    Haskell2010
+
+executable hmailclassifier
+  hs-source-dirs:      app
+  main-is:             Classifier.hs
+  ghc-options:         -Wall -O3
+  build-depends:       attoparsec
+                     , base
+                     , base64-bytestring
+                     , bytestring
+                     , classy-prelude
+                     , pcre-light
+                     , text
+                     , unordered-containers >= 0.2.5.1
+                     , mail-utils
+  default-language:    Haskell2010
+
+--executable hmailfilter
+--  hs-source-dirs:      app
+--  main-is:             Classifier.hs
+--  ghc-options:         -Wall -O3
+--  build-depends:       attoparsec
+--                     , base
+--                     , base64-bytestring
+--                     , bytestring
+--                     , classy-prelude
+--                     , pcre-light
+--                     , text
+--                     , unordered-containers >= 0.2.5.1
+--                     , mail-utils
+--  default-language:    Haskell2010
+
+test-suite tests
+  hs-source-dirs:  test
+  Main-Is:         Spec.hs
+  Type:            exitcode-stdio-1.0
+  Build-Depends:   QuickCheck
+                 , attoparsec
+                 , base
+                 , bytestring
+                 , classy-prelude
+                 , unordered-containers 
+                 , mail-utils
+  Ghc-Options:     -Wall -threaded -O3 -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/githubuser/mail-utils
