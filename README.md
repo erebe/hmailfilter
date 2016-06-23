@@ -2,7 +2,7 @@
 
 Managing rules with procmail is too cumbersome for me (especially if genericity is required).
 
-So instead, this programme will parse email's headers, use the associated rules, and print the destination folder for procmail to use it.
+So instead, this program will parse email's headers, use the associated rules, and print the destination folder for procmail to use it.
 
 You can see rule and filter examples in src/Main.
 
