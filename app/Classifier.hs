@@ -32,7 +32,7 @@ virtualUser hs = T.decodeUtf8 . fromMaybe mainUser $ capitalize =<< extractUser 
     capitalize user = if not . null $ user
                       then return $ (BC.singleton . C.toUpper $ BC.head user) <> BC.map C.toLower (BC.tail user)
                       else mempty
-    rPattern        = Re.compile "([a-z._-]+)@" [Re.caseless]
+    rPattern        = Re.compile ("([a-z._-]+)@" <> mainDomain) [Re.caseless]
 
 
 deMoi :: Match Any
@@ -78,10 +78,9 @@ haskellBeg :: Match Any
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
 
 blacklist :: Match Any
-blacklist =    from (anyOf [".Meds="])
+blacklist =    from (anyOf [".Meds=", "datesmail.com"])
             <> for  (anyOf ["mediapart@"])
-            <> from (anyOf ["datesmail.com"])
-            <> subject (anyOf ["naked photo", "pussy"])
+            <> subject (anyOf ["naked photo","new photos"," dating ", "pussy", "hot photo", "Happy New Year!"])
 
 main :: IO ()
 main = do
