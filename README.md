@@ -1,4 +1,8 @@
-# hmailfilter
+<p align="center">
+  <img src="https://github.com/erebe/hmailfilter/raw/master/log_hmailfilter.png" alt="hmailfilter logo"/>
+</p>
+
+## Description
 
 Managing rules with procmail is too cumbersome for me (especially if genericity is required).
 
