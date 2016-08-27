@@ -1,0 +1,23 @@
+- hosts: server
+  remote_user: root
+
+  vars:
+    user: erebe
+
+  tasks:
+    ################################
+    # APP
+    ################################
+    - name: Install hmailfilter
+      copy: src=config/hmailclassifier
+            dest=/usr/local/bin/
+            owner={{ user }}
+            group={{ user }}
+            mode=u=rx,g=rx,o=rx
+
+    - name: Add {{ user }} config
+      template: src=config/procmailrc
+                dest=/home/{{ user }}/.procmailrc
+                owner={{ user }}
+                group={{ user }}
+                mode=u=r,g=r,o=r
