@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 
 module Rule where
@@ -71,6 +72,9 @@ originalTo f = Match $ mk . match [OriginalTo] f
 
 mailingList :: (Text -> Bool) -> Match Any
 mailingList f = Match $ mk . match [ListID] f
+
+isSpam :: Match Any
+isSpam = Match $ mk . match [Spam] (`isInfixOf` "YES")
 
 anyOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
 anyOf oneOf m = any (`isInfixOf` m) oneOf

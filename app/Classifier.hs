@@ -82,19 +82,27 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
             <> for  (anyOf ["mediapart@"])
             <> subject (anyOf ["naked photo","new photos"," dating ", "pussy", "hot photo", "Happy New Year!"])
 
+  
 main :: IO ()
 main = do
     headers <- getHeaders <$> BL.getContents
 
     let outputPath = msum $ runRule headers <$> myRules
     let path = fromMaybe defaultMailbox outputPath
+    
+    
     putStrLn path
+    
 
     where
       defaultMailbox = ".Alpha/"
       myRules = [
+
+           -- Spam
+            [isSpam]       ->> const ".Spam"
+
            -- Blacklist
-            [blacklist]    ->> const "/dev/null"
+          , [blacklist]    ->> const "/dev/null"
 
            -- Perso
           , [deMoi]        ->> const ".Moi/"
