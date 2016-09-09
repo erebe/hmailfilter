@@ -99,7 +99,7 @@ main = do
       myRules = [
 
            -- Spam
-            [isSpam]       ->> const ".Spam"
+            [isSpam]       ->> const ".Spam/"
 
            -- Blacklist
           , [blacklist]    ->> const "/dev/null"

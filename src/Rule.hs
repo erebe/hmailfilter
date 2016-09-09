@@ -59,7 +59,7 @@ match validHeaders f headers =
 {-# INLINE match #-}
   
 for :: Mk m => (Text -> Bool) -> Match m
-for f = Match $ mk . match [OriginalTo, To, Cc, Bcc] f
+for f = Match $ mk . match [To, Cc, Bcc] f
 
 from :: Mk m => (Text -> Bool) -> Match m
 from f = Match $ mk . match [From] f
