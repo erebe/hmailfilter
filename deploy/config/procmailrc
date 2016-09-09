@@ -20,7 +20,7 @@ DEST=`/usr/local/bin/hmailclassifier`
 # doveadm expunge -u erebe mailbox TheOne savedbefore 3d
 # Avoid mailling mails and blacklisted ones !
 :0 c
-* ! DEST ?? (\.Mailing|/null)
+* ! DEST ?? (\.Mailing|/null|\.Spam)
 ./
 
 
