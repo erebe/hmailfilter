@@ -98,11 +98,11 @@ main = do
       defaultMailbox = ".Alpha/"
       myRules = [
 
-           -- Spam
-            [isSpam]       ->> const ".Spam/"
-
            -- Blacklist
-          , [blacklist]    ->> const "/dev/null"
+            [blacklist]    ->> const "/dev/null"
+
+           -- Spam
+          , [isSpam]       ->> const ".Spam/"
 
            -- Perso
           , [deMoi]        ->> const ".Moi/"

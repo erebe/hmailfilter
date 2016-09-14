@@ -1,8 +1,8 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 
 module Rule where
@@ -57,7 +57,7 @@ match validHeaders f headers =
                       ofoldMap (Any . f . content) headers'
                     ) validHeaders
 {-# INLINE match #-}
-  
+
 for :: Mk m => (Text -> Bool) -> Match m
 for f = Match $ mk . match [To, Cc, Bcc] f
 
@@ -76,10 +76,10 @@ mailingList f = Match $ mk . match [ListID] f
 isSpam :: Match Any
 isSpam = Match $ mk . match [Spam] (`isInfixOf` "YES")
 
-anyOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
+anyOf :: (MonoFoldable mono, IsSequence (Element mono), Eq (Element (Element mono))) => mono -> Element mono -> Bool
 anyOf oneOf m = any (`isInfixOf` m) oneOf
 {-# INLINE anyOf #-}
 
-allOf :: (MonoTraversable t, EqSequence (Element t)) => t -> Element t -> Bool
+allOf :: (MonoFoldable mono, IsSequence (Element mono), Eq (Element (Element mono))) => mono -> Element mono -> Bool
 allOf oneOf m = all (`isInfixOf` m) oneOf
 {-# INLINE allOf #-}
