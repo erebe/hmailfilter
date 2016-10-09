@@ -60,26 +60,14 @@ netdata =    from (anyOf ["netdata@erebe.eu"])
     isBackupTime (Just time) = time > TimeOfDay 5 0 0 && time < TimeOfDay 6 0 0
     isBackupTime _           = False
 
-wyplay :: Match Any
-wyplay = for $ anyOf ["wyplay@erebe.eu"]
-
 insa :: Match Any
 insa = for $ anyOf ["@led.insa-lyon.fr", "@insa-lyon.fr", "@insalien.org", "@listes.insa-lyon.fr"]
-
-orgaIF :: Match Any
-orgaIF = subject $ anyOf ["[BdE - Equipe Orga IF]"]
-
-bde :: Match Any
-bde = subject $ anyOf ["[ BdE -"]
 
 devNull :: Match Any
 devNull = for $ anyOf ["devnull@"]
 
 tabulaRasa :: Match Any
 tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
-
-haskell :: Match Any
-haskell = mailingList $ anyOf ["haskell"]
 
 haskellCafe :: Match Any
 haskellCafe = mailingList $ anyOf ["haskell-cafe" ]
@@ -97,6 +85,7 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
 main :: IO ()
 main = do
     headers <- getHeaders <$> BL.getContents
+
 
     let outputPath = msum $ runRule headers <$> myRules
     let path = fromMaybe defaultMailbox outputPath
@@ -126,11 +115,8 @@ main = do
 
            -- Professionnel
           , [atos]         ->> const ".Professionnel.Bull/"
-          , [wyplay]       ->> const ".Professionnel.Wyplay/"
 
            -- Scolarité
-          , [insa, orgaIF] ->> const ".Scolarite.INSA.BdE.OrgaIF/"
-          , [insa, bde]    ->> const ".Scolarite.INSA.BdE/"
           , [insa]         ->> const ".Scolarite.INSA/"
 
            -- ToMe
