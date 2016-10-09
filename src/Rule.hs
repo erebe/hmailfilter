@@ -38,7 +38,7 @@ instance Mk All where
 class ToRule f where
     (->>) :: f -> ([Header] -> Text) -> Rule
 
-instance ToRule ([Match Any]) where
+instance ToRule [Match Any] where
     ruless ->> onMatchF = Rule
                         (Match (\hs -> mk $ all (getAny . flip doesMatch hs) ruless))
                         onMatchF
@@ -46,7 +46,7 @@ instance ToRule ([Match Any]) where
 instance ToRule (Match All) where
     ruless ->> onMatchF = Rule ruless onMatchF
 
-instance ToRule ([Match All]) where
+instance ToRule [Match All] where
     ruless ->> onMatchF = Rule (fold ruless) onMatchF
 
 runRule :: HashMap HeaderName [Header] -> Rule -> Maybe Text
