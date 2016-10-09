@@ -11,6 +11,7 @@ import           ClassyPrelude       hiding (for, toList)
 import           Data.HashMap.Strict
 import           Data.Monoid         (All (..), Any (..))
 import           Parser              (Header (..), HeaderName (..))
+import Data.Time.Format
 
 
 newtype Match m = Match { doesMatch :: HashMap HeaderName [Header] -> m }
@@ -45,6 +46,9 @@ instance ToRule ([Match Any]) where
 instance ToRule (Match All) where
     ruless ->> onMatchF = Rule ruless onMatchF
 
+instance ToRule ([Match All]) where
+    ruless ->> onMatchF = Rule (fold ruless) onMatchF
+
 runRule :: HashMap HeaderName [Header] -> Rule -> Maybe Text
 runRule hs (Rule rule onMatch')
   | getAll $ doesMatch rule hs = Just $ onMatch' $ mconcat $ snd <$> toList hs
@@ -64,14 +68,17 @@ for f = Match $ mk . match [To, Cc, Bcc] f
 from :: Mk m => (Text -> Bool) -> Match m
 from f = Match $ mk . match [From] f
 
-subject :: (Text -> Bool) -> Match Any
+subject :: Mk m => (Text -> Bool) -> Match m
 subject f = Match $ mk . match [Subject] f
 
-originalTo :: (Text -> Bool) -> Match Any
+originalTo :: Mk m => (Text -> Bool) -> Match m
 originalTo f = Match $ mk . match [OriginalTo] f
 
-mailingList :: (Text -> Bool) -> Match Any
+mailingList :: Mk m => (Text -> Bool) -> Match m
 mailingList f = Match $ mk . match [ListID] f
+
+date :: (Monad m' , Mk m, ParseTime t) => (m' t -> Bool) -> Match m
+date f = Match $ mk . match [Date] (f . parseTimeM True defaultTimeLocale "%a, %e %b %Y %T %z (%Z)" . unpack)
 
 isSpam :: Match Any
 isSpam = Match $ mk . match [Spam] (`isInfixOf` "YES")

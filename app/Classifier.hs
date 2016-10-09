@@ -15,6 +15,7 @@ import           Data.HashMap.Strict   (singleton)
 import           Data.Monoid           (All, Any, getAny)
 import qualified Data.Text.Encoding    as T
 import qualified Text.Regex.PCRE.Light as Re
+import Data.Time.LocalTime
 
 
 mainUser, mainDomain, mainEmail :: IsString a => a
@@ -50,6 +51,14 @@ atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net", "bull@erebe.eu"]
 famille :: Match Any
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
+netdata :: Match All
+netdata =    from (anyOf ["netdata@erebe.eu"])
+          <> date isBackupTime
+  where
+    isBackupTime :: Maybe TimeOfDay -> Bool
+    isBackupTime (Just time) = time > TimeOfDay 5 0 0 && time < TimeOfDay 6 0 0
+    isBackupTime _           = False
+
 wyplay :: Match Any
 wyplay = for $ anyOf ["wyplay@erebe.eu"]
 
@@ -82,17 +91,18 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
             <> for  (anyOf ["mediapart@"])
             <> subject (anyOf ["naked photo","new photos"," dating ", "pussy", "hot photo", "Happy New Year!"])
 
-  
+
+
 main :: IO ()
 main = do
     headers <- getHeaders <$> BL.getContents
 
     let outputPath = msum $ runRule headers <$> myRules
     let path = fromMaybe defaultMailbox outputPath
-    
-    
+
+
     putStrLn path
-    
+
 
     where
       defaultMailbox = ".Alpha/"
@@ -103,6 +113,7 @@ main = do
 
            -- Spam
           , [isSpam]       ->> const ".Spam/"
+          , [netdata]      ->> const ".Spam/"
 
            -- Perso
           , [deMoi]        ->> const ".Moi/"
