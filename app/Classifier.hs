@@ -14,8 +14,9 @@ import qualified Data.Char             as C
 import           Data.HashMap.Strict   (singleton)
 import           Data.Monoid           (All, Any, getAny)
 import qualified Data.Text.Encoding    as T
+import           Data.Time.LocalTime
 import qualified Text.Regex.PCRE.Light as Re
-import Data.Time.LocalTime
+
 
 
 mainUser, mainDomain, mainEmail :: IsString a => a

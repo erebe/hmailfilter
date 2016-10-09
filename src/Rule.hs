@@ -10,8 +10,8 @@ module Rule where
 import           ClassyPrelude       hiding (for, toList)
 import           Data.HashMap.Strict
 import           Data.Monoid         (All (..), Any (..))
+import           Data.Time.Format
 import           Parser              (Header (..), HeaderName (..))
-import Data.Time.Format
 
 
 newtype Match m = Match { doesMatch :: HashMap HeaderName [Header] -> m }
