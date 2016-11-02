@@ -49,6 +49,9 @@ pourDomaine = for $ anyOf ["@erebe.eu"]
 atos :: Match Any
 atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net", "bull@erebe.eu"]
 
+criteo :: Match Any
+criteo = for $ anyOf ["@criteo.com"]
+
 famille :: Match Any
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
@@ -115,6 +118,7 @@ main = do
 
            -- Professionnel
           , [atos]         ->> const ".Professionnel.Bull/"
+          , [criteo]       ->> const ".Professionnel.Criteo/"
 
            -- Scolarité
           , [insa]         ->> const ".Scolarite.INSA/"
