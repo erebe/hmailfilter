@@ -49,9 +49,6 @@ pourDomaine = for $ anyOf ["@erebe.eu"]
 atos :: Match Any
 atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net", "bull@erebe.eu"]
 
-criteo :: Match Any
-criteo = for $ anyOf ["@criteo.com"]
-
 famille :: Match Any
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
@@ -84,6 +81,17 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
             <> subject (anyOf ["naked photo","new photos"," dating ", "pussy", "hot photo", "Happy New Year!"])
 
 
+criteo :: Match Any
+criteo = for $ anyOf ["@criteo.com"]
+
+review :: Match Any
+review = from $ anyOf ["review@"]
+
+onCall :: Match Any
+onCall = from $ anyOf ["@opsgenie.net"]
+
+jira :: Match Any
+jira = from $ anyOf ["agile@criteo"]
 
 main :: IO ()
 main = do
@@ -118,6 +126,9 @@ main = do
 
            -- Professionnel
           , [atos]         ->> const ".Professionnel.Bull/"
+          , [criteo, review]       ->> const ".Professionnel.Criteo.Review/"
+          , [criteo, onCall]       ->> const ".Professionnel.Criteo.OnCall/"
+          , [criteo, jira]       ->> const ".Professionnel.Criteo.Jira/"
           , [criteo]       ->> const ".Professionnel.Criteo/"
 
            -- Scolarité
