@@ -83,10 +83,10 @@ date f = Match $ mk . match [Date] (f . parseTimeM True defaultTimeLocale "%a, %
 isSpam :: Match Any
 isSpam = Match $ mk . match [Spam] (`isInfixOf` "YES")
 
-anyOf :: (MonoFoldable mono, IsSequence (Element mono), Eq (Element (Element mono))) => mono -> Element mono -> Bool
-anyOf oneOf m = any (`isInfixOf` m) oneOf
+anyOf :: [Text] -> Text -> Bool
+anyOf oneOf m = let m' = toLower m in any (`isInfixOf` m') oneOf
 {-# INLINE anyOf #-}
 
-allOf :: (MonoFoldable mono, IsSequence (Element mono), Eq (Element (Element mono))) => mono -> Element mono -> Bool
-allOf oneOf m = all (`isInfixOf` m) oneOf
+allOf :: [Text] -> Text -> Bool
+allOf oneOf m = let m' = toLower m in all (`isInfixOf` m) oneOf
 {-# INLINE allOf #-}
