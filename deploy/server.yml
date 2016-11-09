@@ -21,3 +21,21 @@
                 owner={{ user }}
                 group={{ user }}
                 mode=u=r,g=r,o=r
+
+    ################################
+    # SYSTEMD
+    ################################
+    - name: Copy systemd service
+      template: src=config/purgemailbox@.service
+                dest=/usr/lib/systemd/system/
+
+    - name: Copy systemd timer
+      template: src=config/purgemailbox@.timer
+                dest=/usr/lib/systemd/system/
+
+    - name: reload systemd
+      command: systemctl daemon-reload
+
+    - name: purgemailbox timer started
+      service: name=purgemailbox@{{ user }}.timer state=started enabled=true
+

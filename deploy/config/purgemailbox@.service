@@ -1,0 +1,10 @@
+[Unit]
+Description=Purge mailbox for %I
+
+[Service]
+Type=oneshot
+User=%I
+ExecStart=/usr/bin/doveadm expunge -u %I  mailbox inbox savedbefore 0d
+
+[Install]
+WantedBy=multi-user.target

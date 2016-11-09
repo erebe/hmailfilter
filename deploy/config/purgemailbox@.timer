@@ -1,0 +1,13 @@
+[Unit]
+Description=Purge mailbox every day for %I
+
+[Timer]
+OnCalendar=*-*-* 4:00:00
+Persistent=true
+
+# Not yet supported on systemd of debian jessie
+#RandomizedDelaySec=30min
+
+[Install]
+WantedBy=timers.target
+

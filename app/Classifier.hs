@@ -93,6 +93,12 @@ onCall = from $ anyOf ["@opsgenie.net"]
 jira :: Match Any
 jira = from $ anyOf ["agile@criteo"]
 
+jenkins :: Match Any
+jenkins = from $ anyOf ["qabot"]
+
+prod :: Match Any
+prod = from $ anyOf ["@criteo.prod"]
+
 main :: IO ()
 main = do
     headers <- getHeaders <$> BL.getContents
@@ -128,7 +134,9 @@ main = do
           , [atos]         ->> const ".Professionnel.Bull/"
           , [criteo, review]       ->> const ".Professionnel.Criteo.Review/"
           , [criteo, onCall]       ->> const ".Professionnel.Criteo.OnCall/"
-          , [criteo, jira]       ->> const ".Professionnel.Criteo.Jira/"
+          , [criteo, jira]         ->> const ".Professionnel.Criteo.Jira/"
+          , [criteo, jenkins]      ->> const ".Professionnel.Criteo.Jenkins/"
+          , [criteo, prod]         ->> const ".Professionnel.Criteo.Prod/"
           , [criteo]       ->> const ".Professionnel.Criteo/"
 
            -- Scolarité
