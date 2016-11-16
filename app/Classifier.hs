@@ -99,6 +99,12 @@ jenkins = from $ anyOf ["qabot"]
 prod :: Match Any
 prod = from $ anyOf ["@criteo.prod"]
 
+preprod :: Match Any
+preprod = from $ anyOf ["@criteo.preprod"]
+
+team :: Match Any
+team = from $ anyOf ["storage-monitoring@criteo"]
+
 main :: IO ()
 main = do
     headers <- getHeaders <$> BL.getContents
@@ -136,7 +142,9 @@ main = do
           , [criteo, onCall]       ->> const ".Professionnel.Criteo.OnCall/"
           , [criteo, jira]         ->> const ".Professionnel.Criteo.Jira/"
           , [criteo, jenkins]      ->> const ".Professionnel.Criteo.Jenkins/"
+          , [criteo, team]         ->> const ".Professionnel.Criteo.Team/"
           , [criteo, prod]         ->> const ".Professionnel.Criteo.Prod/"
+          , [criteo, preprod]      ->> const ".Professionnel.Criteo.Preprod/"
           , [criteo]       ->> const ".Professionnel.Criteo/"
 
            -- Scolarité
