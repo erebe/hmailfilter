@@ -84,6 +84,9 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
 criteo :: Match Any
 criteo = for $ anyOf ["@criteo.com"]
 
+bes :: Match Any
+bes = subject (anyOf ["BES-"])
+
 review :: Match Any
 review = from $ anyOf ["review@"]
 
@@ -138,6 +141,7 @@ main = do
 
            -- Professionnel
           , [atos]         ->> const ".Professionnel.Bull/"
+          , [criteo, bes]          ->> const ".Professionnel.Criteo.Bes/"
           , [criteo, review]       ->> const ".Professionnel.Criteo.Review/"
           , [criteo, onCall]       ->> const ".Professionnel.Criteo.OnCall/"
           , [criteo, jira]         ->> const ".Professionnel.Criteo.Jira/"
