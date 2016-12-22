@@ -85,7 +85,10 @@ criteo :: Match Any
 criteo = for $ anyOf ["@criteo.com"]
 
 bes :: Match Any
-bes = subject (anyOf ["BES-"])
+bes = subject $ anyOf ["bes-"]
+
+cron :: Match Any
+cron = subject $ anyOf ["cron <root@"]
 
 review :: Match Any
 review = from $ anyOf ["review@"]
@@ -141,6 +144,7 @@ main = do
 
            -- Professionnel
           , [atos]         ->> const ".Professionnel.Bull/"
+          , [criteo, cron]         ->> const "/dev/null/"
           , [criteo, bes]          ->> const ".Professionnel.Criteo.Bes/"
           , [criteo, review]       ->> const ".Professionnel.Criteo.Review/"
           , [criteo, onCall]       ->> const ".Professionnel.Criteo.OnCall/"
