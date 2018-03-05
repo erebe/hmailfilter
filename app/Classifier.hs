@@ -69,8 +69,11 @@ devNull = for $ anyOf ["devnull@"]
 tabulaRasa :: Match Any
 tabulaRasa = for $ anyOf ["tabula.rasa@erebe.eu", "editeur.algo@erebe.eu"]
 
+cassandraMailling :: Match Any
+cassandraMailling = mailingList $ anyOf ["cassandra.apache.org"]
+
 haskellCafe :: Match Any
-haskellCafe = mailingList $ anyOf ["haskell-cafe" ]
+haskellCafe = mailingList $ anyOf ["haskell-cafe"]
 
 haskellBeg :: Match Any
 haskellBeg = mailingList $ anyOf ["beginners.haskell.org"]
@@ -139,8 +142,9 @@ main = do
           , [famille]      ->> const ".Famille/"
 
            -- Mailing List
-          , [haskellCafe]  ->> const ".Mailing.Haskell-Cafe/"
-          , [haskellBeg]   ->> const ".Mailing.Haskell-Beginner/"
+          , [haskellCafe]         ->> const ".Mailing.Haskell-Cafe/"
+          , [haskellBeg]          ->> const ".Mailing.Haskell-Beginner/"
+          , [cassandraMailling]   ->> const ".Mailing.Cassandra/"
 
            -- Professionnel
           , [atos]         ->> const ".Professionnel.Bull/"
