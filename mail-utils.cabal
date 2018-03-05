@@ -13,6 +13,10 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
+source-repository head
+  type:     git
+  location: https://github.com/githubuser/mail-utils
+
 library
   hs-source-dirs:      src
   exposed-modules:     Parser, Rule
@@ -25,6 +29,20 @@ library
                      , pcre-light
                      , text
                      , unordered-containers >= 0.2.5.1
+  default-language:    Haskell2010
+
+test-suite tests
+  hs-source-dirs:  test
+  Main-Is:         Spec.hs
+  Type:            exitcode-stdio-1.0
+  Build-Depends:   QuickCheck
+                 , attoparsec
+                 , base
+                 , bytestring
+                 , classy-prelude
+                 , unordered-containers
+                 , mail-utils
+  ghc-options:     -Wall -O3 -rtsopts -with-rtsopts=-K1K
   default-language:    Haskell2010
 
 executable hmailclassifier
@@ -43,20 +61,3 @@ executable hmailclassifier
                      , mail-utils
   default-language:    Haskell2010
 
-test-suite tests
-  hs-source-dirs:  test
-  Main-Is:         Spec.hs
-  Type:            exitcode-stdio-1.0
-  Build-Depends:   QuickCheck
-                 , attoparsec
-                 , base
-                 , bytestring
-                 , classy-prelude
-                 , unordered-containers 
-                 , mail-utils
-  ghc-options:     -Wall -O3 -rtsopts -with-rtsopts=-K1K
-  default-language:    Haskell2010
-
-source-repository head
-  type:     git
-  location: https://github.com/githubuser/mail-utils

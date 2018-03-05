@@ -15,7 +15,8 @@ RUN rm -rf ~/.stack &&  \
 
 COPY . /mnt
 
-RUN stack install --split-objs --ghc-options="-fPIC -fllvm"
+RUN echo '  ld-options: -static' >> mail-utils.cabal ; \
+    stack install --split-objs --ghc-options="-fPIC -fllvm"
 RUN upx --ultra-brute /root/.local/bin/hmailclassifier
 
 
