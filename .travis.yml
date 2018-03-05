@@ -1,21 +1,19 @@
 sudo: required
 services:
-  - docker
-
+- docker
 addons:
   apt:
     packages:
     - docker-ce
-
 before_install:
-  - docker build -t erebe/hmailclassifier .
-
+- docker build -t erebe/hmailclassifier .
 script:
-  - docker run --rm -ti -v $(pwd):/mnt erebe/hmailclassifier /bin/sh -c 'cp hmailclassifier /mnt'
-
+- docker run --rm -ti -v $(pwd):/mnt erebe/hmailclassifier /bin/sh -c 'cp hmailclassifier /mnt'
 deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: sPjBU2/iOh73MRfwLh9FbfqyCAlLPQAPJw6sakEhYa2WEc8VlNtQn0PdhdkfxlbRqa9IzpbXoEq3ITMwmaGoAXSLHlY4JzMLDJs6V9QI6KSjEkavQ+u5DvLz1LEsL8CgKuA8/BZ77Y0VjvCHj0iTfjqXy17dRsjYuBEkAc4Ord/Afkj9PGa6kmChc1v5sjULtum94RxhjgGBlwHxNg/W8p5UiPB5yDuP8x3UKO2VNjVLQoxMJP9cWGYBfwZQXP44cbZMJds1VH+jMCsnmqzg20JamukjnDOYaqDDac+DwpafHGL1tjzscXzOJA4S+kU98etgSzH+CcXQM5A/651Oig9jxoT2YME0Hym5H7lgVWItDr5SLe2/O5TFQZxTmGkX4rQl6bbM4Yf1PawZnNiU7/U00Zp27RdjS1dSLwPyBfObt+n2aQttR7LAIGxNbQXNcP7B9J/DyL2KOJw9VoWNATcGbvnFS1ACRKuHPCVkdhqA2IhQSGdG5kQP8zSuXYSqb3Bck11DdRxoJhcQy7IXhP9hvs4Hq1fhf6H9x1DGxqqur6Ew2m/hDZ8fhcATYrWrgYxg1W7XF1VZbHJQJnJ9h76CLBxzCS7ANBuaBcUHOcDe0yqGYWarohhmkhymEwSATwJT5dxFuwFEpZkeTP3axSzg16zL3emjMmiqdjGg/54=
+    secure: Q56oeJcQM1SddlXsY7hw0LDYCWcG9Feo73iL+2cYv0aFDVN607XGTsDRyaKnbyRHyP1lX9Dc/Sm0F0ZNmKxh7rwfVOJncreDa9SdNRnoAekWd/kxVwK7Kv+1O8iIZWs7auVDKubZZshkxt6oNWaOEzf43duWqxmRb+WpRCaKbrFy9I6MDfnb5kZI+kFxseLOWMulHj+aIjzx3llMbbmSvp8RR6Q3Vegxv1/PqWR8OhNrLuq60p1aVG1lCFeiHMQaz5vhTjHKWCRnVEithtjW4Bt3F6/FXv6yXB8ISMtRsa9jlEDTM1P1QegaizltBNNj86zxlKu0aePRMqb/1SubqeX4EX/YHiKzOGPUWtxgKbkeCyHUNFw6fXnv3rjy2+tXv6LYNxbmKEfrq5JKla9gbEZcTU84TeQk+ZTlVrCaHwDOFpGIv5++M6onhliLCovenya4XF05lnBbcJpVhn15vhAs3C/nptR0J2IhyNRJLeLvlYPHwNAT+f2rVrVCZFGExG2/JBkw3vksDrIeyeaiUk6UKkMZfopoc6jmh5NmqX1foCtc1yu1A32SijczJI8wB+zPVvjp+KRErTJEd6oeTpgiH7RgfPfiIwiYEtnlbqPbPAlTHUaiXMNH+SJb3Z7cHsacrJvzJPdbJ37zAU5/ADW3H7IGH9/0yGmKu8u+Tvk=
   file: hmailclassifier
+  on:
+    repo: erebe/hmailfilter

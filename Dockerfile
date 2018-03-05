@@ -28,5 +28,5 @@ WORKDIR /root
 COPY --from=builder /root/.local/bin/hmailclassifier .
 RUN chmod +x ./hmailclassifier
 
-ENTRYPOINT ["./hmailclassifier"]
+CMD ["./hmailclassifier"]
 
