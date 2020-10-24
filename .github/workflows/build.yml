@@ -7,11 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: actions/setup-haskell@v1
-      with:
-        ghc-version: '8.8.3'
-        cabal-version: '3.0'
-       
     - name: Build
       run: |
         docker build -t hmailfilter .
