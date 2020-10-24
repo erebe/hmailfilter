@@ -44,9 +44,6 @@ pourMoi = for $ anyOf ["romain.gerard@erebe.eu", "erebe@erebe.eu"]
 pourDomaine :: Match Any
 pourDomaine = for $ anyOf ["@erebe.eu"]
 
-atos :: Match Any
-atos = for $ anyOf ["@amesys.fr", "@atos.net", "@bull.net", "bull@erebe.eu"]
-
 famille :: Match Any
 famille = from $ anyOf ["laetitiagerard25@gmail.com", "maider.gerard313@gmail.com"]
 
@@ -57,9 +54,6 @@ netdata =    from (anyOf ["netdata@erebe.eu"])
     isBackupTime :: Maybe TimeOfDay -> Bool
     isBackupTime (Just time) = time > TimeOfDay 5 0 0 && time < TimeOfDay 6 0 0
     isBackupTime _           = False
-
-insa :: Match Any
-insa = for $ anyOf ["@led.insa-lyon.fr", "@insa-lyon.fr", "@insalien.org", "@listes.insa-lyon.fr"]
 
 devNull :: Match Any
 devNull = for $ anyOf ["devnull@"]
@@ -80,37 +74,9 @@ blacklist :: Match Any
 blacklist =    from (anyOf [".Meds=", "datesmail.com"])
             <> for  (anyOf ["mediapart@"])
             <> subject (anyOf ["naked photo","new photos"," dating ", "pussy", "hot photo", "Happy New Year!"])
-
-
-criteo :: Match Any
-criteo = for $ anyOf ["@criteo.com"]
-
-bes :: Match Any
-bes = subject $ anyOf ["bes-"]
-
-cron :: Match Any
-cron = subject $ anyOf ["cron <root@"]
-
-review :: Match Any
-review = from $ anyOf ["review@"]
-
-onCall :: Match Any
-onCall = from $ anyOf ["@opsgenie.net"]
-
-jira :: Match Any
-jira = from $ anyOf ["agile@criteo"]
-
-jenkins :: Match Any
-jenkins = from $ anyOf ["qabot"]
-
-prod :: Match Any
-prod = from $ anyOf ["@criteo.prod"]
-
-preprod :: Match Any
-preprod = from $ anyOf ["@criteo.preprod"]
-
-team :: Match Any
-team = from $ anyOf ["storage-monitoring@criteo"]
+            
+github :: Match Any
+github = from $ anyOf ["@github.com"]
 
 main :: IO ()
 main = do
@@ -143,22 +109,8 @@ main = do
           , [haskellCafe]         ->> const ".Mailing.Haskell-Cafe/"
           , [haskellBeg]          ->> const ".Mailing.Haskell-Beginner/"
           , [cassandraMailling]   ->> const ".Mailing.Cassandra/"
-
-           -- Professionnel
-          , [atos]         ->> const ".Professionnel.Bull/"
-          , [criteo, cron]         ->> const "/dev/null/"
-          , [criteo, bes]          ->> const ".Professionnel.Criteo.Bes/"
-          , [criteo, review]       ->> const ".Professionnel.Criteo.Review/"
-          , [criteo, onCall]       ->> const ".Professionnel.Criteo.OnCall/"
-          , [criteo, jira]         ->> const ".Professionnel.Criteo.Jira/"
-          , [criteo, jenkins]      ->> const ".Professionnel.Criteo.Jenkins/"
-          , [criteo, team]         ->> const ".Professionnel.Criteo.Team/"
-          , [criteo, prod]         ->> const ".Professionnel.Criteo.Prod/"
-          , [criteo, preprod]      ->> const ".Professionnel.Criteo.Preprod/"
-          , [criteo]       ->> const ".Professionnel.Criteo/"
-
-           -- Scolarité
-          , [insa]         ->> const ".Scolarite.INSA/"
+          
+          , [github]   ->> const ".Compte.Github/"
 
            -- ToMe
           , [pourMoi]      ->> const defaultMailbox
