@@ -17,7 +17,6 @@ COPY . /mnt
 
 RUN echo '  ld-options: -static' >> mail-utils.cabal ; \
     stack install --split-objs --ghc-options="-fPIC -fllvm"
-RUN upx --ultra-brute /root/.local/bin/hmailclassifier
 
 
 
