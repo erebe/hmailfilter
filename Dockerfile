@@ -1,7 +1,7 @@
 FROM alpine:3.12 as builder
 MAINTAINER github@erebe.eu
 
-RUN apk --no-cache add --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
+RUN apk --no-cache add \
         ca-certificates git ghc upx curl musl-dev gmp-dev zlib-dev pcre-dev
 RUN curl -sSL https://get.haskellstack.org/ | sh
 
