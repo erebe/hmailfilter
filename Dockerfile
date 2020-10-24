@@ -1,4 +1,4 @@
-FROM alpine:3.6 as builder
+FROM alpine:3.11 as builder
 MAINTAINER github@erebe.eu
 
 RUN apk --no-cache add --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
