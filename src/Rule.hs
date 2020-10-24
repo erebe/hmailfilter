@@ -7,7 +7,8 @@
 
 module Rule where
 
-import           ClassyPrelude       hiding (for, toList)
+import           Protolude           hiding (for, toList)
+import qualified Data.Text     as T
 import           Data.HashMap.Strict
 import           Data.Monoid         (All (..), Any (..))
 import           Data.Time.Format
@@ -56,9 +57,9 @@ runRule hs (Rule rule onMatch')
 
 match :: [HeaderName] -> (Text -> Bool) -> HashMap HeaderName [Header] -> Bool
 match validHeaders f headers =
-  getAny $ ofoldMap (\headerName ->
+  getAny $ foldMap (\headerName ->
                       let headers' = lookupDefault mempty headerName headers in
-                      ofoldMap (Any . f . content) headers'
+                      foldMap (Any . f . content) headers'
                     ) validHeaders
 {-# INLINE match #-}
 
@@ -78,15 +79,15 @@ mailingList :: Mk m => (Text -> Bool) -> Match m
 mailingList f = Match $ mk . match [ListID] f
 
 date :: (Monad m' , Mk m, ParseTime t) => (m' t -> Bool) -> Match m
-date f = Match $ mk . match [Date] (f . parseTimeM True defaultTimeLocale "%a, %e %b %Y %T %z (%Z)" . unpack)
+date f = Match $ mk . match [Date] (f . parseTimeM True defaultTimeLocale "%a, %e %b %Y %T %z (%Z)" . T.unpack)
 
 isSpam :: Match Any
-isSpam = Match $ mk . match [Spam] (`isInfixOf` "YES")
+isSpam = Match $ mk . match [Spam] (`T.isInfixOf` "YES")
 
 anyOf :: [Text] -> Text -> Bool
-anyOf oneOf m = let m' = toLower m in any (`isInfixOf` m') oneOf
+anyOf oneOf m = let m' = T.toLower m in any (`T.isInfixOf` m') oneOf
 {-# INLINE anyOf #-}
 
 allOf :: [Text] -> Text -> Bool
-allOf oneOf m = let m' = toLower m in all (`isInfixOf` m) oneOf
+allOf oneOf m = let m' = T.toLower m in all (`T.isInfixOf` m) oneOf
 {-# INLINE allOf #-}

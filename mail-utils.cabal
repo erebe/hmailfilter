@@ -25,7 +25,7 @@ library
                      , base64-bytestring
                      , bytestring
                      , time
-                     , classy-prelude
+                     , protolude
                      , pcre-light
                      , text
                      , unordered-containers >= 0.2.5.1
@@ -39,7 +39,7 @@ test-suite tests
                  , attoparsec
                  , base
                  , bytestring
-                 , classy-prelude
+                 , protolude
                  , unordered-containers
                  , mail-utils
   ghc-options:     -Wall -O3 -rtsopts -with-rtsopts=-K1K
@@ -53,7 +53,7 @@ executable hmailclassifier
                      , base
                      , base64-bytestring
                      , bytestring
-                     , classy-prelude
+                     , protolude
                      , pcre-light
                      , text
                      , time

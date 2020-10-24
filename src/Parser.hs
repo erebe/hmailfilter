@@ -14,14 +14,15 @@ module Parser (
 
 
 
-import           ClassyPrelude                    hiding (foldMap, fromList)
+import           Protolude                        hiding (foldMap, fromList)
 import           Data.Attoparsec.ByteString       as P hiding (takeWhile)
 import           Data.Attoparsec.ByteString.Char8 as PC
 import           Data.Attoparsec.ByteString.Lazy  as PL
 import           Data.ByteString.Base64           as B64 hiding (decode)
+import qualified Data.ByteString                  as B
 import qualified Data.ByteString.Char8            as BC
 import qualified Data.Char                        as C
-import           Data.HashMap.Strict              (fromList, lookupDefault)
+import           Data.HashMap.Strict              
 import qualified Data.Text.Encoding               as T
 import qualified Data.Text.Encoding.Error         as T
 import qualified Text.Regex.PCRE.Light            as Re
@@ -93,7 +94,7 @@ parseQEncodedWord = do
       parseHexadecimal = do
           hex <- P.take 2
           let ret = parseOnly hexadecimal hex
-          return $! either (const hex) singleton ret
+          return $! either (const hex) B.singleton ret
 
 {-# INLINE parseQEncodedWord #-}
 
@@ -110,7 +111,7 @@ prettyFormatHeaderContent str = fromMaybe (T.decodeUtf8 str) $ do
     where
       decodeEncoding en = if BC.map C.toUpper en == "B"
                           then B64.decodeLenient
-                          else \str' -> either (const str') concat
+                          else \str' -> either (const str') B.concat
                                         (parseOnly (many1 parseQEncodedWord) str')
       decodeCharset ch = case BC.map C.toUpper ch of
                           "UTF-8"  -> T.decodeUtf8With T.ignore

@@ -6,7 +6,7 @@ module Main where
 import           Parser
 import           Rule
 
-import           ClassyPrelude         hiding (for, singleton)
+import           Protolude             hiding (for, from)
 import           Control.Monad         (msum)
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
@@ -31,7 +31,7 @@ virtualUser hs = T.decodeUtf8 . fromMaybe mainUser $ capitalize =<< extractUser 
                                                     then [str]
                                                     else mempty)
     extractUser val = listToMaybe val >>= \s -> Re.match rPattern (T.encodeUtf8 s) [] >>= listToMaybe . drop 1
-    capitalize user = if not . null $ user
+    capitalize user = if not . BC.null $ user
                       then return $ (BC.singleton . C.toUpper $ BC.head user) <> BC.map C.toLower (BC.tail user)
                       else mempty
     rPattern        = Re.compile ("([a-z._-]+)@" <> mainDomain) [Re.caseless]

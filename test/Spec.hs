@@ -3,7 +3,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-import           ClassyPrelude                    hiding (replicateM)
+import           Protolude                        hiding (replicateM, check)
+import qualified Prelude                          as P
+import           Data.List                        (partition)
 import           Control.Monad                    (replicateM)
 import           Data.Attoparsec.ByteString.Char8 as PC
 import qualified Data.ByteString.Char8            as BC
@@ -24,21 +26,21 @@ exHeaders = ["MIME-Version: 1.0\r\n"
         <> "X-Sender: romain.gerard@erebe.eu\r\n"
         <> "User-Agent: Roundcube Webmail/0.9.5\n"]
 
-asciiChar :: String
+asciiChar :: P.String 
 asciiChar = ['!'..'~']
 
 headerField :: Gen ByteString
 headerField = BC.pack <$> (listOf1 . elements . filter (/= ':') $ asciiChar)
 
 headerBody :: Gen ByteString
-headerBody = BC.pack <$> (listOf1 . elements . filter (`onotElem` asString "\r\n") $ asciiChar)
+headerBody = BC.pack <$> (listOf1 . elements . filter (`notElem` ("\r\n" :: P.String)) $ asciiChar)
 
 genHeader :: Gen ByteString
 genHeader = do
     f <- headerField
     nb <- choose (1, 10) :: Gen Int
     bs <- replicateM nb headerBody
-    let body = foldMap (\b -> asByteString " " <> b <> "\r\n") bs
+    let body = foldMap (\b -> (BC.pack " ") <> b <> "\r\n") bs
     return $ f <> ":" <> BC.tail body
 
 prop_HeaderParser :: Property
@@ -47,7 +49,7 @@ prop_HeaderParser = forAll genHeader $ \h ->
 
 genHeaders :: Gen ByteString
 genHeaders = do
-    hs <- ofoldMap id <$> listOf1 genHeader
+    hs <- foldMap P.id <$> listOf1 genHeader
     return $ hs <> "\r\n"
 
 prop_HeadersParser :: Property
@@ -70,4 +72,4 @@ return []
 main :: IO Bool
 main = do
     ret <- $(quickCheckAll)
-    if ret then return ret else error "tests failed"
+    if ret then return ret else P.error "tests failed"
