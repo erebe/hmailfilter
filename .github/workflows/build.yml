@@ -15,10 +15,10 @@ jobs:
     - name: Build
       run: |
         docker build -t hmailfilter .
-        docker run --rm -v $(pwd):/data hmailfilter /bin/cp /root/.local/bin/hmailclassifier /data
+        docker run --rm -v $(pwd):/data hmailfilter /bin/cp /root/hmailclassifier /data
 
     - uses: actions/upload-artifact@v1
       with:
         name: hmailclassifier
-        path: /root/hmailclassifier
+        path: hmailclassifier
 
