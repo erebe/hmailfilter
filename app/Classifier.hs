@@ -7,12 +7,10 @@ import           Parser
 import           Rule
 
 import           Protolude             hiding (for, from)
-import           Control.Monad         (msum)
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy  as BL
 import qualified Data.Char             as C
 import           Data.HashMap.Strict   (singleton)
-import           Data.Monoid           (All, Any, getAny)
 import qualified Data.Text.Encoding    as T
 import           Data.Time.LocalTime
 import qualified Text.Regex.PCRE.Light as Re

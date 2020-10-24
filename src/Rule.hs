@@ -13,6 +13,7 @@ import           Data.HashMap.Strict
 import           Data.Monoid         (All (..), Any (..))
 import           Data.Time.Format
 import           Parser              (Header (..), HeaderName (..))
+import           Control.Monad.Fail  (MonadFail)
 
 
 newtype Match m = Match { doesMatch :: HashMap HeaderName [Header] -> m }
@@ -78,7 +79,7 @@ originalTo f = Match $ mk . match [OriginalTo] f
 mailingList :: Mk m => (Text -> Bool) -> Match m
 mailingList f = Match $ mk . match [ListID] f
 
-date :: (Monad m' , Mk m, ParseTime t) => (m' t -> Bool) -> Match m
+date :: (MonadFail m', Monad m' , Mk m, ParseTime t) => (m' t -> Bool) -> Match m
 date f = Match $ mk . match [Date] (f . parseTimeM True defaultTimeLocale "%a, %e %b %Y %T %z (%Z)" . T.unpack)
 
 isSpam :: Match Any

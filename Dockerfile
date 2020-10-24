@@ -1,4 +1,4 @@
-FROM alpine:3.11 as builder
+FROM alpine:3.12 as builder
 MAINTAINER github@erebe.eu
 
 RUN apk --no-cache add --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
@@ -21,7 +21,7 @@ RUN upx --ultra-brute /root/.local/bin/hmailclassifier
 
 
 
-FROM alpine:latest as runner
+FROM alpine:3.12 as runner
 MAINTAINER github@erebe.eu
 
 WORKDIR /root
