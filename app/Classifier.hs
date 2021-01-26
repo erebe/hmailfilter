@@ -78,6 +78,10 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
 github :: Match Any
 github = from $ anyOf ["@github.com"]
 
+qovery :: Match Any
+qovery = subject $ anyOf ["Qovery"]
+
+
 main :: IO ()
 main = do
     headers <- getHeaders <$> BL.getContents
@@ -109,6 +113,9 @@ main = do
           , [haskellCafe]         ->> const ".Mailing.Haskell-Cafe/"
           , [haskellBeg]          ->> const ".Mailing.Haskell-Beginner/"
           , [cassandraMailling]   ->> const ".Mailing.Cassandra/"
+          
+           -- Boulot
+          , [qovery]   ->> const ".Professionnel.Qovery/"
           
           , [github]   ->> const ".Compte.Github/"
 
