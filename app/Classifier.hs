@@ -79,7 +79,7 @@ github :: Match Any
 github = from $ anyOf ["@github.com"]
 
 qovery :: Match Any
-qovery = subject $ anyOf ["Qovery"]
+qovery = subject $ anyOf ["Qovery", "qovery"]
 
 
 main :: IO ()
