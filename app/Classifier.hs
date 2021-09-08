@@ -78,6 +78,9 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
 github :: Match Any
 github = from $ anyOf ["@github.com"]
 
+qoverySpam :: Match Any
+qoverySpam = from $ anyOf ["no-reply@qovery.com"]
+
 qovery :: Match Any
 qovery = subject $ anyOf ["Qovery", "qovery"]
 
@@ -115,7 +118,8 @@ main = do
           , [cassandraMailling]   ->> const ".Mailing.Cassandra/"
           
            -- Boulot
-          , [qovery]   ->> const ".Professionnel.Qovery/"
+          , [qoverySpam] ->> const ".Spam/" 
+          , [qovery]     ->> const ".Professionnel.Qovery/"
           
           , [github]   ->> const ".Compte.Github/"
 
