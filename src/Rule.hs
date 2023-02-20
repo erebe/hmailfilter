@@ -83,7 +83,7 @@ date :: (MonadFail m', Monad m' , Mk m, ParseTime t) => (m' t -> Bool) -> Match 
 date f = Match $ mk . match [Date] (f . parseTimeM True defaultTimeLocale "%a, %e %b %Y %T %z (%Z)" . T.unpack)
 
 isSpam :: Match Any
-isSpam = Match $ mk . match [Spam] (`T.isInfixOf` "YES")
+isSpam = Match $ mk . match [Spam] (`T.isInfixOf` "yes")
 
 anyOf :: [Text] -> Text -> Bool
 anyOf oneOf m = let m' = T.toLower m in any (`T.isInfixOf` m') oneOf
