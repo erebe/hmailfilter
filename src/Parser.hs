@@ -64,7 +64,7 @@ headerMapping = fromList [
     , ("cc"            , Cc)
     , ("bcc"           , Bcc)
     , ("list-id"       , ListID)
-    , ("x-spam-flag"   , Spam)
+    , ("x-spam"        , Spam)
     ]
 
 parseHeaderName :: Parser HeaderName
