@@ -41,6 +41,7 @@ data HeaderName = ReturnPath
                 | Bcc
                 | ListID
                 | Spam
+                | SpamAction
                 | Unknown !Text
                 deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
@@ -65,6 +66,7 @@ headerMapping = fromList [
     , ("bcc"           , Bcc)
     , ("list-id"       , ListID)
     , ("x-spam"        , Spam)
+    , ("x-spam-action" , SpamAction)
     ]
 
 parseHeaderName :: Parser HeaderName

@@ -78,6 +78,9 @@ blacklist =    from (anyOf [".Meds=", "datesmail.com"])
 github :: Match Any
 github = from $ anyOf ["@github.com"]
 
+proxmox :: Match Any
+proxmox = for $ anyOf ["root@lab.lan"]
+
 qoverySpam :: Match Any
 qoverySpam = from $ anyOf ["no-reply@qovery.com"]
 
@@ -107,6 +110,7 @@ main = do
            -- Spam
           , [isSpam]       ->> const ".Spam/"
           , [netdata]      ->> const ".Spam/"
+          , [proxmox]      ->> const ".Spam/"
 
            -- Perso
           , [deMoi]        ->> const ".Moi/"
